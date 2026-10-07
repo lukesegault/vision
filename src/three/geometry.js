@@ -7,6 +7,31 @@ export const smoothstep = (a, b, x) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
 };
+/* Smooth 3D value noise, deterministic per seed, for cloth drape. */
+const h3 = (x, y, z, seed) => {
+  let h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263) ^ Math.imul(z | 0, 1274126177) ^ Math.imul(seed | 0, 2246822519);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+};
+const fade = (t) => t * t * (3 - 2 * t);
+function noise3(x, y, z, seed) {
+  const xi = Math.floor(x);
+  const yi = Math.floor(y);
+  const zi = Math.floor(z);
+  const xf = fade(x - xi);
+  const yf = fade(y - yi);
+  const zf = fade(z - zi);
+  const l = (a, b, t) => a + (b - a) * t;
+  return l(
+    l(l(h3(xi, yi, zi, seed), h3(xi + 1, yi, zi, seed), xf), l(h3(xi, yi + 1, zi, seed), h3(xi + 1, yi + 1, zi, seed), xf), yf),
+    l(l(h3(xi, yi, zi + 1, seed), h3(xi + 1, yi, zi + 1, seed), xf), l(h3(xi, yi + 1, zi + 1, seed), h3(xi + 1, yi + 1, zi + 1, seed), xf), yf),
+    zf
+  );
+}
+// three octaves, roughly -0.5 .. 0.5
+export const fbm3 = (x, y, z, seed = 0) =>
+  noise3(x, y, z, seed) * 0.56 + noise3(x * 2.07, y * 2.07, z * 2.07, seed + 11) * 0.29 + noise3(x * 4.3, y * 4.3, z * 4.3, seed + 23) * 0.15 - 0.5;
+
 const perimeter = (a, b) => Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
 
 /* A cross-section of a garment: a superellipse (n > 2 is boxier) at height y.
@@ -90,7 +115,7 @@ function weldSeam(g, rows, cols) {
 /* Loft a tube-like garment body through a stack of sections (top to bottom).
    The seam sits at the back centre; UVs are in metres, measured from the
    front centre, so fabric textures keep a true scale. */
-export function loftSections(sections, { radial = 96, foldFreq = 7 } = {}) {
+export function loftSections(sections, { radial = 128, foldFreq = 7, drape = null } = {}) {
   const rows = sections.length;
   const cols = radial + 1;
   const pos = new Float32Array(rows * cols * 3);
@@ -98,6 +123,7 @@ export function loftSections(sections, { radial = 96, foldFreq = 7 } = {}) {
   const acc = new Float32Array(cols);
   for (let i = 0; i < rows; i++) {
     const sec = sections[i];
+    const t = i / (rows - 1);
     for (let j = 0; j < cols; j++) {
       const f = j / radial;
       const th = -Math.PI / 2 + f * TAU;
@@ -105,10 +131,26 @@ export function loftSections(sections, { radial = 96, foldFreq = 7 } = {}) {
       const s = Math.sin(th);
       const e = 2 / sec.n;
       const fold = 1 + sec.fold * Math.sin(foldFreq * th + sec.phase + i * 0.35);
+      let x = sec.cx + sec.hw * sgnPow(c, e) * fold;
+      let z = sec.cz + sec.hd * sgnPow(s, e) * fold;
+      if (drape) {
+        // soft vertical folds that grow toward the hem, plus a ripple at the
+        // bottom edge, pushed along the surface normal
+        const w = 0.2 + 0.8 * smoothstep(0.1, 1, t);
+        let off = drape.amp * w * 2 * fbm3(c * drape.fx, s * drape.fx, sec.y * drape.fy, drape.seed);
+        if (drape.ripple) off += drape.ripple * smoothstep(0.82, 1, t) * Math.sin(sec.y * 95 + th * 2 + drape.seed);
+        let nx = (x - sec.cx) / (sec.hw * sec.hw);
+        let nz = (z - sec.cz) / (sec.hd * sec.hd);
+        const nl = Math.hypot(nx, nz) || 1;
+        nx /= nl;
+        nz /= nl;
+        x += nx * off;
+        z += nz * off;
+      }
       const k = (i * cols + j) * 3;
-      pos[k] = sec.cx + sec.hw * sgnPow(c, e) * fold;
+      pos[k] = x;
       pos[k + 1] = sec.y;
-      pos[k + 2] = sec.cz + sec.hd * sgnPow(s, e) * fold;
+      pos[k + 2] = z;
     }
     // true distance around the section, measured from the front centre, so
     // the fabric keeps its real scale on the flat front as well as the sides
@@ -132,7 +174,7 @@ export function loftSections(sections, { radial = 96, foldFreq = 7 } = {}) {
 
 /* Loft an elliptical tube along a path: sleeves and similar. radii(t) gives
    { rx, rz } for t in 0..1 along the path. */
-export function loftCurve(points, radii, { segs = 28, radial = 28, foldAmp = 0.01, foldFreq = 5 } = {}) {
+export function loftCurve(points, radii, { segs = 48, radial = 36, drape = null } = {}) {
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
   const length = curve.getLength();
   const cols = radial + 1;
@@ -155,9 +197,19 @@ export function loftCurve(points, radii, { segs = 28, radial = 28, foldAmp = 0.0
     for (let j = 0; j < cols; j++) {
       const f = j / radial;
       const th = f * TAU;
-      const fold = 1 + foldAmp * Math.sin(foldFreq * th + t * 9);
-      const ex = Math.cos(th) * rx * fold;
-      const ez = Math.sin(th) * rz * fold;
+      const c = Math.cos(th);
+      const s = Math.sin(th);
+      let off = 0;
+      if (drape) {
+        // long drape folds, plus creases across the elbow on the inner side
+        off = drape.amp * 2 * fbm3(c * drape.fx, s * drape.fx, t * length * drape.fy, drape.seed);
+        const elbow = Math.exp(-(((t - 0.5) / 0.13) ** 2));
+        off += drape.crease * elbow * Math.sin(t * length * 62 + drape.seed) * (0.45 + 0.55 * Math.max(0, -s));
+        // gathered fabric at the cuff
+        off += drape.crease * 0.6 * smoothstep(0.82, 0.96, t) * Math.sin(t * length * 90 + th * 3);
+      }
+      const ex = c * (rx + off);
+      const ez = s * (rz + off);
       const k = (i * cols + j) * 3;
       pos[k] = p.x + N.x * ex + B.x * ez;
       pos[k + 1] = p.y + N.y * ex + B.y * ez;
@@ -200,7 +252,7 @@ function surfaceZ(sec, x) {
    neck that rises into a stand at the back and drops into two points at the
    front. Because it follows the body, it sits flat the way a real one does. */
 export function collarOnSurface(sections, {
-  back = 0.034, point = 0.088, lift = 0.018, spread = 0.26, thick = 0.006, broad = 0.5, radial = 72, rows = 6
+  back = 0.034, point = 0.088, lift = 0.018, spread = 0.26, thick = 0.008, broad = 0.5, radial = 72, rows = 6
 } = {}) {
   const cols = radial + 1;
   const pos = new Float32Array((rows + 1) * cols * 3);
@@ -289,16 +341,4 @@ export function frontStrip(sections, { x = 0, width = 0.034, yTop, yBottom, lift
     }
   }
   return gridGeometry(pos, uv, rows, 2);
-}
-
-/* A thin dark line along a row or column of a grid geometry. It stands in for
-   the soft shadow a real collar or lapel casts on the garment beneath. */
-export function edgeLine(geo, cols, { row = null, col = null, radius = 0.0016 }) {
-  const pos = geo.attributes.position;
-  const rows = pos.count / cols;
-  const pts = [];
-  if (row !== null) for (let j = 0; j < cols; j++) pts.push(new THREE.Vector3().fromBufferAttribute(pos, row * cols + j));
-  if (col !== null) for (let i = 0; i < rows; i++) pts.push(new THREE.Vector3().fromBufferAttribute(pos, i * cols + col));
-  const curve = new THREE.CatmullRomCurve3(pts);
-  return new THREE.TubeGeometry(curve, pts.length * 2, radius, 5, false);
 }

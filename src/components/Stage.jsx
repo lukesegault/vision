@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import Scene from '../three/Scene.jsx';
@@ -8,7 +8,18 @@ const pad = (n) => String(n).padStart(2, '0');
 
 /* The 3D rack, plus the captions around it. Drag (or swipe) to spin the rack;
    the arrows step to the previous and next piece. */
+// A lighter pipeline for phones and small screens: shadows, no post-processing.
+const detectQuality = () => {
+  if (typeof window === 'undefined') return 'high';
+  const q = new URLSearchParams(window.location.search).get('quality');
+  if (q === 'low' || q === 'high') return q;
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  const weak = (navigator.hardwareConcurrency ?? 8) <= 4;
+  return coarse || weak || Math.min(window.innerWidth, window.innerHeight) < 600 ? 'low' : 'high';
+};
+
 export default function Stage({ ctrl, front, onFront, onStep, reduced }) {
+  const quality = useMemo(detectQuality, []);
   const drag = useRef({ x: 0, t: 0 });
   const piece = RACK[front] ?? RACK[0];
 
@@ -39,13 +50,14 @@ export default function Stage({ ctrl, front, onFront, onStep, reduced }) {
   return (
     <div className="stage-inner" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
       <Canvas
-        dpr={[1, 2]}
+        dpr={quality === 'high' ? [1, 2] : [1, 1.5]}
+        shadows="percentage"
         camera={{ fov: 28, near: 0.1, far: 60 }}
-        gl={{ alpha: true, antialias: true, toneMapping: THREE.NeutralToneMapping }}
+        gl={{ antialias: quality !== 'high', toneMapping: THREE.NoToneMapping }}
         role="img"
         aria-label="A rotating clothing rack with menswear garments, including a woven rose suede overshirt and trousers"
       >
-        <Scene ctrl={ctrl} onFront={onFront} reduced={reduced} />
+        <Scene ctrl={ctrl} onFront={onFront} reduced={reduced} quality={quality} />
       </Canvas>
 
       <div className="caps">

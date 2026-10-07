@@ -18,8 +18,30 @@ npm run preview    # serve the production build locally
 - **Floating pills**: brand, Work and About, with a background blur.
 - **Work menu**: a glass table of projects (number, title, categories, year). Choosing a row opens a full-screen project sheet. The centre of the page shrinks, fades and blurs while a menu is open.
 - **About menu**: information, services, selected clients, collaborators and contact.
-- **The rack**: ten pieces on a circular rail, turning slowly. Drag or swipe to spin it, use the arrow buttons (or the left and right arrow keys) to step between pieces. The caption at the bottom names the piece at the front. With reduced motion enabled in the system settings, it does not turn on its own.
+- **The rack**: ten pieces on a circular rail, turning slowly. Drag or swipe to spin it, use the arrow buttons (or the left and right arrow keys) to step between pieces. The caption at the bottom names the piece at the front. The garments hang like real ones: each swings on its hook when the rack speeds up, slows down or is dragged, then settles, and a faint breeze keeps them from being perfectly still. With reduced motion enabled in the system settings, it does not turn on its own.
 - **Hero outfit**: a woven rose suede overshirt and trousers (inspired by intrecciato leatherwork) start at the front of the rack.
+
+## How the rendering works
+
+The look is built to resemble a studio photograph rather than a game scene:
+
+- **Studio light**: image-based lighting from a virtual softbox studio (overhead, side strips, rim lights) plus one key light that casts soft shadows between garments, so collars, lapels and sleeves cast shadows on the cloth beneath.
+- **Cloth shading**: physically based materials with fibre sheen, fibre-level normal maps and a procedural weave (the rose suede is an intrecciato basket weave), wool twill, knit, poplin and leather.
+- **Drape**: every piece has seeded folds, elbow creases and hem ripples, so no two hang alike.
+- **Camera**: multisampled rendering, ambient occlusion in the folds and a gentle depth of field that keeps the front of the rack sharp and softens the far side.
+- **Floor**: a soft, diffuse contact shadow that follows the rack, darkest near the base and fading with height.
+
+Phones and weaker machines automatically get a lighter pipeline (shadows and shading, no ambient occlusion or depth of field). Add `?quality=high` or `?quality=low` to the address to force one.
+
+### Going further with real garment models
+
+Procedural garments can only get so close to photographic. For true photorealism, use real 3D garments (a scan, or an export from CLO3D or Marvelous Designer). Put a `.glb` file in `public/models/` and point a piece at it in `src/data/garments.js`:
+
+```js
+{ id: 'intrecciato-overshirt', model: 'models/overshirt.glb', /* ...the rest stays the same */ }
+```
+
+The model replaces the built-in garment once it loads. It is scaled to the piece's `params.length`, centred on the hook and hung from its top edge, so it does not matter what units it was made in. Draco-compressed files work too. If a file fails to load, the built-in garment stays.
 
 ## Edit the content
 
@@ -48,5 +70,6 @@ Each entry in `src/data/garments.js` has a `type` (`shirt` for shirts, jackets a
 ## Notes
 
 - The 3D scene needs WebGL. Without it the menus and project sheets still work and a short message replaces the rack.
+- The post-processing (ambient occlusion and depth of field) costs real GPU time. If it runs slowly on a target device, force the light pipeline by default by changing `detectQuality` in `src/components/Stage.jsx`.
 - Fonts (Archivo) load from Google Fonts. To self-host, download the font files and replace the `<link>` in `index.html` with `@font-face` rules.
 - In development, `window.__vision` exposes the rack's controller for testing. It is removed from production builds.

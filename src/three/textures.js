@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 
-/* Procedural fabric textures. Everything is generated in the browser, so the
-   project has no image or model files to load. UVs are in metres, so each
-   texture's `tile` is the real-world size of one repeat. */
+/* Procedural fabric. Everything is generated in the browser, so the project
+   has no image or model files to load. UVs are in metres, so each texture's
+   `tile` is the real-world size of one repeat. Each fabric bakes a colour map
+   and a normal map (from a height field with fibre-level grain). */
 
 const TAU = Math.PI * 2;
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
@@ -18,20 +19,23 @@ const hexToRgb = (hex) => {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 };
 
-// Run `sample(x, y, out)` per pixel; out = [r, g, b, height] in 0..255 / 0..1.
-function bake(size, sample, { tile, srgb = true }) {
+/* Run `sample(x, y, out)` per pixel; out = [r, g, b, height] (0..255, 0..1).
+   Returns a colour map and a normal map. `strength` scales the relief. */
+function bake(size, sample, { tile, strength }) {
   const mk = () => {
     const c = document.createElement('canvas');
     c.width = c.height = size;
     return c;
   };
   const colorCanvas = mk();
-  const heightCanvas = mk();
+  const normalCanvas = mk();
   const cctx = colorCanvas.getContext('2d');
-  const hctx = heightCanvas.getContext('2d');
+  const nctx = normalCanvas.getContext('2d');
   const cimg = cctx.createImageData(size, size);
-  const himg = hctx.createImageData(size, size);
+  const nimg = nctx.createImageData(size, size);
+  const heights = new Float32Array(size * size);
   const out = [0, 0, 0, 0];
+
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       sample(x, y, out);
@@ -40,27 +44,41 @@ function bake(size, sample, { tile, srgb = true }) {
       cimg.data[p + 1] = out[1];
       cimg.data[p + 2] = out[2];
       cimg.data[p + 3] = 255;
-      const h = clamp01(out[3]) * 255;
-      himg.data[p] = himg.data[p + 1] = himg.data[p + 2] = h;
-      himg.data[p + 3] = 255;
+      heights[y * size + x] = out[3];
+    }
+  }
+
+  // central differences, wrapping at the edges so the tile stays seamless
+  const at = (x, y) => heights[((y + size) % size) * size + ((x + size) % size)];
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = (at(x + 1, y) - at(x - 1, y)) * strength;
+      const dy = (at(x, y + 1) - at(x, y - 1)) * strength;
+      const inv = 1 / Math.hypot(dx, dy, 1);
+      const p = (y * size + x) * 4;
+      nimg.data[p] = (-dx * inv * 0.5 + 0.5) * 255;
+      nimg.data[p + 1] = (dy * inv * 0.5 + 0.5) * 255;
+      nimg.data[p + 2] = (inv * 0.5 + 0.5) * 255;
+      nimg.data[p + 3] = 255;
     }
   }
   cctx.putImageData(cimg, 0, 0);
-  hctx.putImageData(himg, 0, 0);
+  nctx.putImageData(nimg, 0, 0);
+
   const tex = (canvas, isColor) => {
     const t = new THREE.CanvasTexture(canvas);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.repeat.set(1 / tile, 1 / tile);
     t.anisotropy = 8;
-    if (isColor && srgb) t.colorSpace = THREE.SRGBColorSpace;
+    if (isColor) t.colorSpace = THREE.SRGBColorSpace;
     return t;
   };
-  return { map: tex(colorCanvas, true), bump: tex(heightCanvas, false) };
+  return { map: tex(colorCanvas, true), normal: tex(normalCanvas, false) };
 }
 
-/* Intrecciato: a diagonal basket weave of flat strips. The lattice repeats
-   every `cells` strips, so the texture tiles without a visible seam. */
-function weave(base, tile = 0.12) {
+/* Intrecciato: a diagonal basket weave of flat strips with a suede nap. The
+   lattice repeats every `cells` strips, so the texture tiles seamlessly. */
+function weave(base, tile = 0.092) {
   const size = 1024;
   const cells = 4;
   const s = size / (cells * Math.SQRT2);
@@ -82,31 +100,31 @@ function weave(base, tile = 0.12) {
     const edge = Math.min(across, 1 - across);
     const profile = Math.pow(Math.sin(Math.PI * across), 0.5);
     const dip = 0.5 + 0.5 * Math.pow(Math.sin(Math.PI * along), 0.6);
-    const h = profile * dip * clamp01(edge / 0.09);
+    const strip = profile * dip * clamp01(edge / 0.09);
+    const nap = Math.random();
     // washed, mottled suede: slow variation that is periodic in the tile
     const mottle =
       1 +
       0.07 * Math.sin((TAU * x * 2) / size + 1.3) * Math.sin((TAU * y * 3) / size + 0.4) +
       0.05 * Math.sin((TAU * (x * 5 + y * 3)) / size);
-    const shade = (0.66 + 0.4 * h) * (0.9 + 0.2 * hash2(ci, cj)) * mottle * (0.97 + 0.06 * Math.random());
+    const shade = (0.66 + 0.4 * strip) * (0.9 + 0.2 * hash2(ci, cj)) * mottle * (0.94 + 0.12 * nap);
     out[0] = Math.min(255, br * shade);
     out[1] = Math.min(255, bg * shade);
     out[2] = Math.min(255, bb * shade);
-    out[3] = h;
-  }, { tile });
+    out[3] = strip * 0.9 + nap * 0.1;
+  }, { tile, strength: 2.6 });
 }
 
-/* Woollen cloth: a fine diagonal twill under soft noise. Greyscale, tinted by
-   the material colour. */
+/* Woollen cloth: a fine diagonal twill under soft fibre noise. Greyscale,
+   tinted by the material colour. */
 function wool(tile = 0.2) {
   const size = 512;
   return bake(size, (x, y, out) => {
     const tw = 0.5 + 0.5 * Math.sin((TAU * (x + y)) / 8);
     const n = Math.random();
-    const v = 255 * (0.84 + 0.08 * tw + 0.08 * n);
-    out[0] = out[1] = out[2] = v;
-    out[3] = 0.5 * tw + 0.5 * n;
-  }, { tile });
+    out[0] = out[1] = out[2] = 255 * (0.86 + 0.07 * tw + 0.07 * n);
+    out[3] = 0.55 * tw + 0.45 * n;
+  }, { tile, strength: 2.4 });
 }
 
 /* Knitwear: columns of V stitches. */
@@ -116,21 +134,20 @@ function knit(tile = 0.32) {
   return bake(size, (x, y, out) => {
     const phase = x / p + Math.abs(((y / p) % 1) - 0.5) * 0.9;
     const h = 0.5 + 0.5 * Math.cos(TAU * phase);
-    const v = 255 * (0.74 + 0.26 * h) * (0.97 + 0.06 * Math.random());
-    out[0] = out[1] = out[2] = v;
-    out[3] = h;
-  }, { tile });
+    const n = Math.random();
+    out[0] = out[1] = out[2] = 255 * (0.72 + 0.28 * h) * (0.96 + 0.08 * n);
+    out[3] = h * 0.85 + n * 0.15;
+  }, { tile, strength: 4 });
 }
 
-/* Poplin and leather share a near-flat grain. */
-function grain(amount, tile = 0.16) {
+/* Cotton poplin and leather share a near-flat grain. */
+function grain(amount, tile, strength) {
   const size = 256;
   return bake(size, (x, y, out) => {
     const n = Math.random();
-    const v = 255 * (1 - amount + amount * n);
-    out[0] = out[1] = out[2] = v;
+    out[0] = out[1] = out[2] = 255 * (1 - amount + amount * n);
     out[3] = n;
-  }, { tile });
+  }, { tile, strength });
 }
 
 const cache = new Map();
@@ -139,48 +156,57 @@ const once = (key, fn) => {
   return cache.get(key);
 };
 
-/* Materials for each fabric. `color` tints greyscale fabrics; the weave bakes
-   its own colour. */
+const tint = (hex, toward, amount) => new THREE.Color(hex).lerp(new THREE.Color(toward), amount);
+// sheen on dark cloth must stay subtle or it turns grey
+const luma = (hex) => { const c = new THREE.Color(hex); return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b; };
+const sheenFor = (hex, k) => k * (0.25 + 0.75 * Math.min(1, luma(hex) * 3));
+
+/* Physically based cloth. `sheen` is the soft, fibre-scattered rim light that
+   makes wool, cotton and suede read as fabric rather than plastic. */
 export function clothMaterial({ fabric, color }) {
   return once(`cloth:${fabric}:${color}`, () => {
-    const common = { side: THREE.DoubleSide };
+    const common = { side: THREE.DoubleSide, shadowSide: THREE.DoubleSide, metalness: 0 };
     switch (fabric) {
       case 'weave': {
         const t = once(`tex:weave:${color}`, () => weave(color));
-        return new THREE.MeshStandardMaterial({
-          ...common, map: t.map, bumpMap: t.bump, bumpScale: 2.2, roughness: 0.92, metalness: 0
+        return new THREE.MeshPhysicalMaterial({
+          ...common, map: t.map, normalMap: t.normal, normalScale: new THREE.Vector2(0.9, 0.9),
+          roughness: 0.95, sheen: 0.45, sheenRoughness: 0.8, sheenColor: tint(color, '#ffffff', 0.35)
         });
       }
       case 'knit': {
         const t = once('tex:knit', () => knit());
-        return new THREE.MeshStandardMaterial({
-          ...common, color, map: t.map, bumpMap: t.bump, bumpScale: 2.4, roughness: 1, metalness: 0
+        return new THREE.MeshPhysicalMaterial({
+          ...common, color, map: t.map, normalMap: t.normal, normalScale: new THREE.Vector2(1.3, 1.3),
+          roughness: 1, sheen: sheenFor(color, 0.9), sheenRoughness: 0.6, sheenColor: tint(color, '#ffffff', 0.5)
         });
       }
       case 'leather': {
-        const t = once('tex:leather', () => grain(0.35, 0.1));
+        const t = once('tex:leather', () => grain(0.35, 0.1, 2));
         return new THREE.MeshPhysicalMaterial({
-          ...common, color, bumpMap: t.bump, bumpScale: 0.6, roughness: 0.42, metalness: 0,
-          clearcoat: 0.3, clearcoatRoughness: 0.45
+          ...common, color, normalMap: t.normal, normalScale: new THREE.Vector2(0.55, 0.55),
+          roughness: 0.4, clearcoat: 0.35, clearcoatRoughness: 0.42
         });
       }
       case 'poplin': {
-        const t = once('tex:poplin', () => grain(0.06, 0.12));
-        return new THREE.MeshStandardMaterial({
-          ...common, color, map: t.map, roughness: 0.72, metalness: 0
+        const t = once('tex:poplin', () => grain(0.06, 0.12, 0.6));
+        return new THREE.MeshPhysicalMaterial({
+          ...common, color, map: t.map, normalMap: t.normal, normalScale: new THREE.Vector2(0.4, 0.4),
+          roughness: 0.74, sheen: sheenFor(color, 0.5), sheenRoughness: 0.5, sheenColor: tint(color, '#ffffff', 0.6)
         });
       }
       default: {
         const t = once('tex:wool', () => wool());
-        return new THREE.MeshStandardMaterial({
-          ...common, color, map: t.map, bumpMap: t.bump, bumpScale: 1.4, roughness: 0.94, metalness: 0
+        return new THREE.MeshPhysicalMaterial({
+          ...common, color, map: t.map, normalMap: t.normal, normalScale: new THREE.Vector2(0.9, 0.9),
+          roughness: 0.92, sheen: sheenFor(color, 0.8), sheenRoughness: 0.6, sheenColor: tint(color, '#ffffff', 0.32)
         });
       }
     }
   });
 }
 
-export const trimMaterial = once('trim', () => new THREE.MeshStandardMaterial({ color: '#1d1717', roughness: 0.35, metalness: 0.1 }));
-export const hangerMaterial = once('hanger', () => new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.4, metalness: 0.5 }));
-
-export const edgeMaterial = once('edge', () => new THREE.MeshBasicMaterial({ color: '#000000', transparent: true, opacity: 0.3, depthWrite: false }));
+export const trimMaterial = once('trim', () => new THREE.MeshPhysicalMaterial({
+  color: '#1c1616', roughness: 0.28, metalness: 0.05, clearcoat: 0.6, clearcoatRoughness: 0.2
+}));
+export const hangerMaterial = once('hanger', () => new THREE.MeshStandardMaterial({ color: '#161616', roughness: 0.38, metalness: 0.7 }));

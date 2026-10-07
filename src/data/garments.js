@@ -4,6 +4,9 @@
    fabric   'weave', 'wool', 'knit', 'poplin' or 'leather'
    color    cloth colour (the weave bakes its own, so it is the base pink)
    params   proportions in metres; see src/three/builders.js for each key
+   model    optional: a .glb in public/ (for example 'models/overshirt.glb')
+            that replaces the built-in garment once loaded. It is scaled to
+            params.length and hung from the hook; see src/three/models.js.
 
    The first two pieces are the hero outfit and start at the front. */
 export const RACK = [
@@ -11,7 +14,7 @@ export const RACK = [
     id: 'intrecciato-overshirt',
     type: 'shirt',
     fabric: 'weave',
-    color: '#d49aa3',
+    color: '#d89ba5',
     name: 'Intrecciato overshirt',
     note: 'Woven suede, rose',
     params: { length: 0.72, shoulder: 0.236, chest: 0.24, hem: 0.248, depth: 0.072, sleeve: 0.6, buttons: 5 }
@@ -20,7 +23,7 @@ export const RACK = [
     id: 'intrecciato-trousers',
     type: 'trousers',
     fabric: 'weave',
-    color: '#d49aa3',
+    color: '#d89ba5',
     name: 'Intrecciato trousers',
     note: 'Woven suede, rose',
     params: { waist: 0.168, hip: 0.188, length: 1.0, knee: 0.098, hem: 0.092, flare: 0.004 }

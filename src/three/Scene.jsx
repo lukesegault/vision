@@ -1,12 +1,15 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import Rack, { RING_R } from './Rack.jsx';
+import Effects from './Effects.jsx';
+import ContactShadows from './ContactShadows.jsx';
+import { studioEnvironment } from './studio.js';
 
 const FOV = 28;
 const ELEVATION = THREE.MathUtils.degToRad(9);
 const TARGET_Y = 1.02;
+const WHITE = new THREE.Color('#ffffff');
 
 /* Fit the whole rack inside a generous margin, whatever the screen shape. */
 function useFit() {
@@ -25,46 +28,14 @@ function useFit() {
     camera.position.set(0, TARGET_Y + d * Math.sin(ELEVATION), d * Math.cos(ELEVATION));
     camera.lookAt(0, TARGET_Y, 0);
     camera.updateProjectionMatrix();
-    // let the back of the rack fade into the white page
-    scene.fog = new THREE.Fog('#ffffff', d - 0.4, d + RING_R * 2 + 1.2);
+    // let the far side of the rack fade into the white page
+    scene.fog = new THREE.Fog(WHITE, d - 0.2, d + RING_R * 2 + 2.5);
   }, [camera, size.width, size.height, scene]);
 }
 
-/* A soft, baked contact shadow: a blurred ring under the rack. */
-function GroundShadow() {
-  const texture = useMemo(() => {
-    const c = document.createElement('canvas');
-    c.width = c.height = 512;
-    const ctx = c.getContext('2d');
-    const half = 4.2; // plane is 8.4 m wide
-    ctx.filter = 'blur(16px)';
-    ctx.fillStyle = 'rgba(0,0,0,0.045)';
-    ctx.beginPath();
-    ctx.arc(256, 256, (RING_R / half) * 256, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.17)';
-    ctx.lineWidth = 30;
-    ctx.beginPath();
-    ctx.arc(256, 256, (RING_R / half) * 256, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(0,0,0,0.22)';
-    ctx.beginPath();
-    ctx.arc(256, 256, (0.38 / half) * 256, 0, Math.PI * 2);
-    ctx.fill();
-    const t = new THREE.CanvasTexture(c);
-    t.colorSpace = THREE.SRGBColorSpace;
-    return t;
-  }, []);
-  return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, 0.002, 0]} renderOrder={-1}>
-      <planeGeometry args={[8.4, 8.4]} />
-      <meshBasicMaterial map={texture} transparent depthWrite={false} fog={false} />
-    </mesh>
-  );
-}
-
-export default function Scene({ ctrl, onFront, reduced }) {
+export default function Scene({ ctrl, onFront, reduced, quality }) {
   const { gl, scene } = useThree();
+  const high = quality === 'high';
   useFit();
 
   // Development only: window.__vision.cam = { pos: [x, y, z], target: [x, y, z] }
@@ -76,26 +47,51 @@ export default function Scene({ ctrl, onFront, reduced }) {
     camera.lookAt(...cam.target);
   });
 
+  // Several passes render the scene each frame (colour, ambient occlusion,
+  // depth of field, floor shadow). Refresh the shadow map once, not per pass.
   useEffect(() => {
-    const pmrem = new THREE.PMREMGenerator(gl);
-    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    gl.shadowMap.autoUpdate = false;
+    return () => { gl.shadowMap.autoUpdate = true; };
+  }, [gl]);
+  useFrame(() => { gl.shadowMap.needsUpdate = true; }, -2);
+
+  useEffect(() => {
+    scene.background = WHITE;
+    const env = studioEnvironment(gl);
     scene.environment = env;
-    scene.environmentIntensity = 0.55;
+    scene.environmentIntensity = 0.5;
     return () => {
       scene.environment = null;
       env.dispose();
-      pmrem.dispose();
     };
   }, [gl, scene]);
 
   return (
     <>
-      <hemisphereLight args={['#ffffff', '#d9d9de', 0.85]} />
-      <directionalLight position={[3.5, 6, 6]} intensity={1.45} color="#fffaf3" />
-      <directionalLight position={[-5, 3, 2]} intensity={0.55} color="#eef2ff" />
-      <directionalLight position={[0, 4, -6]} intensity={0.5} />
-      <GroundShadow />
+      {/* key light: casts the soft shadows between garments and onto the floor */}
+      <directionalLight
+        position={[2.4, 8.5, 4.6]}
+        intensity={2.2}
+        color="#fff6ea"
+        castShadow
+        shadow-mapSize={high ? [2048, 2048] : [1024, 1024]}
+        shadow-camera-left={-2.7}
+        shadow-camera-right={2.7}
+        shadow-camera-top={3.2}
+        shadow-camera-bottom={-2.2}
+        shadow-camera-near={1}
+        shadow-camera-far={20}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.014}
+        shadow-radius={high ? 7 : 4}
+      />
+      <hemisphereLight args={['#ffffff', '#dcdce2', 0.22]} />
+      <directionalLight position={[-3, 3, -6]} intensity={0.55} color="#eef2ff" />
+
+      <ContactShadows />
+
       <Rack ctrl={ctrl} onFront={onFront} reduced={reduced} />
+      {high && <Effects />}
     </>
   );
 }
