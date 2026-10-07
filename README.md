@@ -1,51 +1,52 @@
 # Vision
 
-A portfolio website for a personal styling project. Plain HTML, CSS and JavaScript, with no build step and no dependencies.
+A single-page portfolio for a menswear personal stylist. The centrepiece is a 3D rack of garments that rotates on its own, on a white page with generous margins, with floating pill navigation and glass menus.
 
-The design is stark black and white with one electric blue accent: oversized condensed type, mono labels, a dense grid, and an Index view that follows your cursor with image previews.
+Built with React, Three.js (through React Three Fiber) and Vite. The garments are modelled in code, so there are no 3D files to download or manage.
 
-## Run it locally
+## Run it
 
 ```sh
-python3 -m http.server 8000
+npm install
+npm run dev        # development server with hot reload
+npm run build      # production build into dist/
+npm run preview    # serve the production build locally
 ```
 
-Then open http://localhost:8000.
+## What is on the page
 
-## Add your photos
+- **Floating pills**: brand, Work and About, with a background blur.
+- **Work menu**: a glass table of projects (number, title, categories, year). Choosing a row opens a full-screen project sheet. The centre of the page shrinks, fades and blurs while a menu is open.
+- **About menu**: information, services, selected clients, collaborators and contact.
+- **The rack**: ten pieces on a circular rail, turning slowly. Drag or swipe to spin it, use the arrow buttons (or the left and right arrow keys) to step between pieces. The caption at the bottom names the piece at the front. With reduced motion enabled in the system settings, it does not turn on its own.
+- **Hero outfit**: a woven rose suede overshirt and trousers (inspired by intrecciato leatherwork) start at the front of the rack.
 
-Every image slot shows a placeholder until a real photo exists, and each placeholder prints the exact filename it is waiting for. Drop a file into `assets/images/` using that name and it replaces the placeholder automatically.
+## Edit the content
 
-| File | Where it appears |
+| What | Where |
 | --- | --- |
-| `hero-1.jpg`, `hero-2.jpg`, `hero-3.jpg` | The three images under the headline |
-| `portrait.jpg` | About section |
-| `look-01.jpg` to `look-08.jpg` | The eight looks in the grid, the Index preview and the viewer |
+| Projects in the Work menu and their sheets | `src/data/projects.js` |
+| Information, services, clients, collaborators, contact | `src/data/about.js` |
+| The pieces on the rack (name, fabric, colour, proportions) | `src/data/garments.js` |
+| Name, tagline and page title | `src/components/Header.jsx`, `index.html` |
+| Colours, type and spacing | `src/styles.css` (variables at the top) |
 
-Use JPG, around 1600px on the long edge and under 500 KB each so the site stays fast. Grid cards crop to 3:4 (the viewer shows the full frame), so keep the subject centered.
+All text and credits in these files are sample content (including the client and collaborator names). Replace them with your own.
 
-## Edit your work
+### Project photos
 
-Looks are defined in `js/content.js`. Each entry has a title, category, year, description, credits and the `image` path. To add a look, copy one block and give it a new `id` and image name. The filter buttons, counts and Index list are generated from the entries.
+Put images in `public/projects/`. Each project expects two files, named after its `id`, for example `intrecciato-study-1.jpg` and `intrecciato-study-2.jpg`. Until a file exists, the sheet shows a placeholder that names the file it is waiting for. A 4:5 portrait crop around 1600px tall works best.
 
-- `ratio` is the photo's width divided by its height (`3 / 4` portrait, `1` square, `3 / 2` landscape). The viewer uses it.
-- `feature: true` makes one look span a large 2 x 2 cell in the grid. Use it on one look at a time.
-- `tone` only changes the placeholder color.
+### Changing the garments
 
-## Edit the text
-
-The headline, about text, services and contact details are in `index.html`. Search for these placeholders and replace them:
-
-- `Vision` and `Vision Styling` (name)
-- `hello@example.com` (email)
-- the Instagram and Pinterest links in the contact section
-- `Paris` and the clock label (location and time zone, also set in `js/main.js`)
-- `English, French` (languages)
-- `Now booking SS27` (availability, top bar and contact section)
-- `Your Name`, `Photographer`, `Model` in `js/content.js`
-
-Colors and fonts are CSS variables at the top of `css/styles.css`. The accent is `--accent`.
+Each entry in `src/data/garments.js` has a `type` (`shirt` for shirts, jackets and coats; `sweater`; `trousers`), a `fabric` (`weave`, `wool`, `knit`, `poplin` or `leather`), a `color`, and `params` in metres (length, shoulder width, sleeve length and so on). The meshes are built in `src/three/builders.js` and the procedural fabrics (including the woven suede) in `src/three/textures.js`. To add a piece, add an entry; the rack spaces itself out automatically.
 
 ## Publish
 
-Any static host works. For GitHub Pages: repository Settings, Pages, then deploy from the branch you want to publish. Netlify and Cloudflare Pages also work with no configuration (no build command, publish directory `/`).
+`npm run build` produces a static `dist/` folder with relative paths, so it works on any static host, including a GitHub Pages project sub-path. For Netlify or Cloudflare Pages, use the build command `npm run build` and the publish directory `dist`.
+
+## Notes
+
+- The 3D scene needs WebGL. Without it the menus and project sheets still work and a short message replaces the rack.
+- Fonts (Archivo) load from Google Fonts. To self-host, download the font files and replace the `<link>` in `index.html` with `@font-face` rules.
+- In development, `window.__vision` exposes the rack's controller for testing. It is removed from production builds.
