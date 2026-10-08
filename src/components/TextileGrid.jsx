@@ -49,6 +49,16 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
   };
   useEffect(() => () => clearTimeout(filmTimer.current), []);
 
+  // Whenever the grid releases this tile (another tile tapped, or a tap on the
+  // empty page), let go of the film and the live surface too.
+  useEffect(() => {
+    if (!active) {
+      stopFilm();
+      surface.current?.leave();
+      rest();
+    }
+  }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (tile.video || reduced()) return undefined;
     const s = createTextileSurface(canvas.current, {
@@ -96,7 +106,12 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
       tabIndex={0}
       aria-label={`${pad(number)}, ${tile.name}, ${tile.note}`}
       onPointerEnter={(e) => { onActivate(tile); surface.current?.enter(e); startFilm(); }}
-      onPointerLeave={() => { onActivate(null); rest(); surface.current?.leave(); stopFilm(); }}
+      onPointerLeave={(e) => {
+        // A finger has no hover: a touched swatch stays active until the next
+        // tap elsewhere, so a quick tap still plays the film.
+        if (e.pointerType === 'touch') return;
+        onActivate(null); rest(); surface.current?.leave(); stopFilm();
+      }}
       onPointerMove={(e) => { track(e); surface.current?.move(e); }}
       onFocus={() => { onActivate(tile); startFilm(); }}
       onBlur={() => { onActivate(null); stopFilm(); }}
@@ -162,6 +177,15 @@ export default function TextileGrid() {
   const [active, setActive] = useState(null);
   const all = [...TEXTILES.left, ...TEXTILES.right];
   const index = active ? all.findIndex((t) => t.id === active.id) : -1;
+
+  // Touch: tapping anywhere that is not a swatch releases the active one
+  useEffect(() => {
+    const release = (e) => {
+      if (e.pointerType === 'touch' && !e.target.closest?.('.tile')) setActive(null);
+    };
+    document.addEventListener('pointerdown', release);
+    return () => document.removeEventListener('pointerdown', release);
+  }, []);
 
   return (
     <section className="archive" data-active={active ? 'true' : undefined} aria-label="Textile archive">

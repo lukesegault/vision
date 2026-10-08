@@ -105,5 +105,5 @@ The rotating 3D rack of garments (woven rose suede outfit, studio lighting, plas
 ## Notes
 
 - Fonts (Archivo) load from Google Fonts. To self-host, download the font files and replace the `<link>` in `index.html` with `@font-face` rules.
-- Hover effects need a mouse. On touch screens, touching or dragging across a swatch gives the same effect.
+- Hover effects need a mouse. On touch screens, tapping a swatch gives the same effect and keeps it on until you tap another swatch or empty space.
 - Only the swatches without a film (five of the eight) use their own small WebGL context. Browsers allow around sixteen, so the grid is comfortably inside the limit.
