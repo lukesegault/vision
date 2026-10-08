@@ -24,8 +24,34 @@ npm run preview    # serve the production build locally
 
 - **Breathing**: each photograph scales between 1 and 1.03 over a slow, very subtle cycle (17 to 25 seconds), each at its own pace and phase so they never move in step.
 - **Hover or keyboard focus**: the other seven swatches recede (faded, desaturated, a touch softer) while the chosen one comes forward with a little more contrast, and its texture pans gently with the pointer. The caption names the swatch.
-- **Easing**: everything uses one sharp curve, `cubic-bezier(0.16, 1, 0.3, 1)`, for a crisp, deliberate feel, never bouncy. The swatches also appear with a clean cut, wiped in one after another.
-- **Reduced motion**: with reduced motion enabled in the system settings, the breathing, panning and reveal are switched off.
+- **Each fabric moves like itself.** Under the pointer, the photograph is relit from the pointer using its own light and dark detail as relief, and every material adds its own behaviour:
+  - **Woven and draped leather**: soft highlights slide across the strips and along the folds, as if you were tilting the hide.
+  - **Floral embellishment**: sequins and rhinestones twinkle as the light moves.
+  - **Velvet**: a pool of light follows the pointer, and the pile looks flattened behind the stroke and raised ahead of it.
+  - **Snakeskin**: each scale catches the light.
+  - **Shearling**: the fibres drift in a slight breeze and bend the way the hand moves.
+  - **Denim**: a soft sheen along the twill and the stitching.
+  - **Chainmail**: the metal discs glint, and the mesh ripples outward from the pointer when it moves.
+  
+  At rest every swatch is exactly the photograph, and the effect eases out when the pointer leaves. Nothing runs unless the pointer is over a swatch.
+- **Easing**: the CSS uses one sharp curve, `cubic-bezier(0.16, 1, 0.3, 1)`, for a crisp, deliberate feel, never bouncy. The swatches also appear with a clean cut, wiped in one after another.
+- **Fallbacks**: without WebGL the plain photographs are shown (the fade, pan and breathing still work). With reduced motion enabled in the system settings, the live effects, breathing, panning and reveal are all switched off.
+
+### Tuning a fabric
+
+The reaction of each swatch is set by its `fx` entry in `src/data/textiles.js`. All values are optional; `FX_DEFAULTS` in `src/lib/textileGL.js` explains each one:
+
+| Setting | What it does |
+| --- | --- |
+| `bump` | How much relief is read from the photograph (raise for deeper weaves) |
+| `fold` | 0 for fine grain, 1 for broad folds |
+| `diffuse` | How much the pointer's light changes the shading |
+| `gloss`, `shine`, `metal` | Highlight strength, tightness, and how much it is tinted by the fabric |
+| `glitter`, `glitterCells`, `glitterFrom` | Sparkle strength, size and the brightness a detail needs to sparkle |
+| `sheen`, `nap` | A pool of light, and pile that flattens along the stroke (velvet) |
+| `warp`, `ripple` | Fibres drifting and bending (fur), and ripples when touched (mesh) |
+
+If a swatch looks over-processed, lower `bump` and `diffuse` first.
 
 ## Add your photographs
 
@@ -63,4 +89,5 @@ The rotating 3D rack of garments (woven rose suede outfit, studio lighting, plas
 ## Notes
 
 - Fonts (Archivo) load from Google Fonts. To self-host, download the font files and replace the `<link>` in `index.html` with `@font-face` rules.
-- Hover effects need a mouse. On touch screens, tapping a swatch gives the same state.
+- Hover effects need a mouse. On touch screens, touching or dragging across a swatch gives the same effect.
+- Each swatch uses its own small WebGL context (eight in total). Browsers allow around sixteen, so the grid is comfortably inside the limit.

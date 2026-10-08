@@ -352,6 +352,20 @@ a { color: inherit; }
 }
 .has-image .tile-pan img { opacity: 1; }
 
+/* the live (WebGL) surface sits on the photograph and takes over once ready */
+.tile-pan canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s var(--cut);
+  animation: breathe var(--dur, 20s) ease-in-out var(--delay, 0s) infinite;
+}
+.has-gl .tile-pan canvas { opacity: 1; }
+.has-gl .tile-pan img { visibility: hidden; animation: none; }
+
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.03); }
@@ -509,6 +523,6 @@ a { color: inherit; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .tile-pan img { animation: none; }
+  .tile-pan img, .tile-pan canvas { animation: none; }
   .tile-pan { transform: none; }
 }

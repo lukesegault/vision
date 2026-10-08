@@ -1,16 +1,42 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TEXTILES } from '../data/textiles.js';
+import { createTextileSurface } from '../lib/textileGL.js';
 
 const BASE = import.meta.env.BASE_URL;
 const pad = (n) => String(n).padStart(2, '0');
 
 /* One swatch: a square window onto a textile photograph. The photograph sits
    in an over-scanned layer that pans with the pointer, and breathes (a very
-   slow scale) on its own clock, so the fabric feels alive. */
+   slow scale) on its own clock, so the fabric feels alive.
+
+   The photograph is drawn by a small WebGL surface (src/lib/textileGL.js) that
+   makes it react to the pointer like the real material. If WebGL is not
+   available, or the system asks for reduced motion, the plain <img> underneath
+   is shown instead. */
 function Tile({ tile, index, number, onActivate, onLoaded, active }) {
   const [state, setState] = useState('pending'); // pending | ready | missing
+  const [live, setLive] = useState(false);       // the WebGL surface is showing
   const pan = useRef(null);
+  const canvas = useRef(null);
+  const surface = useRef(null);
   const raf = useRef(0);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const s = createTextileSurface(canvas.current, {
+      src: `${BASE}textiles/${tile.file}`,
+      focus: tile.focus,
+      fx: tile.fx,
+      onReady: () => setLive(true),
+      onFail: () => setLive(false)
+    });
+    surface.current = s;
+    return () => {
+      s?.dispose();
+      surface.current = null;
+      setLive(false);
+    };
+  }, [tile]);
 
   const track = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -37,13 +63,13 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
 
   return (
     <figure
-      className={`tile${active ? ' is-active' : ''}${state === 'ready' ? ' has-image' : ''}`}
+      className={`tile${active ? ' is-active' : ''}${state === 'ready' ? ' has-image' : ''}${live ? ' has-gl' : ''}`}
       style={style}
       tabIndex={0}
       aria-label={`${pad(number)}, ${tile.name}, ${tile.note}`}
-      onPointerEnter={() => onActivate(tile)}
-      onPointerLeave={() => { onActivate(null); rest(); }}
-      onPointerMove={track}
+      onPointerEnter={(e) => { onActivate(tile); surface.current?.enter(e); }}
+      onPointerLeave={() => { onActivate(null); rest(); surface.current?.leave(); }}
+      onPointerMove={(e) => { track(e); surface.current?.move(e); }}
       onFocus={() => onActivate(tile)}
       onBlur={() => onActivate(null)}
     >
@@ -61,6 +87,7 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
             onError={() => setState('missing')}
           />
         )}
+        <canvas ref={canvas} aria-hidden="true" />
       </div>
     </figure>
   );
