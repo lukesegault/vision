@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
-import Scene from '../three/Scene.jsx';
-import { RACK } from '../data/garments.js';
+import Scene from './three/Scene.jsx';
+import { RACK } from './garments.js';
 
 const pad = (n) => String(n).padStart(2, '0');
 

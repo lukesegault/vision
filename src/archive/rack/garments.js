@@ -3,10 +3,10 @@
    type     'shirt' (shirts, jackets, coats), 'sweater' or 'trousers'
    fabric   'weave', 'wool', 'knit', 'poplin' or 'leather'
    color    cloth colour (the weave bakes its own, so it is the base pink)
-   params   proportions in metres; see src/three/builders.js for each key
+   params   proportions in metres; see three/builders.js for each key
    model    optional: a .glb in public/ (for example 'models/overshirt.glb')
             that replaces the built-in garment once loaded. It is scaled to
-            params.length and hung from the hook; see src/three/models.js.
+            params.length and hung from the hook; see three/models.js.
 
    The first two pieces are the hero outfit and start at the front. */
 export const RACK = [

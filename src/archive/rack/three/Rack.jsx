@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { RACK, STEP } from '../data/garments.js';
+import { RACK, STEP } from '../garments.js';
 import { buildGarment } from './builders.js';
 import { loadGarmentModel } from './models.js';
 import { isPlaster } from './look.js';

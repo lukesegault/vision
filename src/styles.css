@@ -288,6 +288,131 @@ a { color: inherit; }
   .cap-center { justify-items: start; text-align: left; }
 }
 
+
+/* ---------- Tactile Archive Grid ---------- */
+.archive {
+  --cut: cubic-bezier(0.16, 1, 0.3, 1); /* a sharp, deliberate cut, never bouncy */
+  --g: min(32vw, 58vh, 600px);          /* side of each 2 x 2 grid */
+  --gap: clamp(6px, 0.55vw, 10px);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  /* three equal spaces: left margin, middle, right margin */
+  grid-template-columns: 1fr var(--g) 1fr var(--g) 1fr;
+  grid-template-rows: var(--g);
+  align-content: center;
+  padding-block: 4.5rem;
+}
+
+.tgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--gap);
+}
+.tgrid-left { grid-column: 2; }
+.tgrid-right { grid-column: 4; }
+
+.tile {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #f1f1f1;
+  outline: none;
+  cursor: crosshair;
+  transition: opacity 0.75s var(--cut), filter 0.75s var(--cut);
+  animation: cut-in 1.15s var(--cut) both;
+  animation-delay: calc(var(--i) * 70ms + 120ms);
+}
+@keyframes cut-in {
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+/* the photograph lives in a layer slightly larger than the tile, so it can pan
+   without ever revealing an edge */
+.tile-pan {
+  position: absolute;
+  inset: -3.5%;
+  transform: translate3d(calc(var(--px, 0) * 2.6%), calc(var(--py, 0) * 2.6%), 0);
+  transition: transform 1.1s var(--cut);
+  will-change: transform;
+}
+.tile-pan img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition: opacity 0.6s var(--cut);
+  animation: breathe var(--dur, 20s) ease-in-out var(--delay, 0s) infinite;
+}
+.has-image .tile-pan img { opacity: 1; }
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
+}
+
+/* placeholder for a swatch whose photograph has not been added yet */
+.tile-ph {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top right, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.1) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(to bottom right, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.1) 50%, transparent calc(50% + 0.5px));
+}
+.tile-ph-file {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 0.7rem;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.has-image .tile-ph { display: none; }
+
+/* hover or focus: the chosen swatch comes forward, the other seven recede */
+.archive[data-active] .tile {
+  opacity: 0.72;
+  filter: saturate(0.4) brightness(0.96) blur(0.35px);
+}
+.archive[data-active] .tile.is-active {
+  opacity: 1;
+  filter: contrast(1.08) saturate(1.1);
+}
+.tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* "Hover" on a mouse, "Tap" on a touch screen */
+.hint-touch { display: none; }
+@media (hover: none) {
+  .hint-hover { display: none; }
+  .hint-touch { display: inline; }
+}
+
+/* the archive reuses the caption row of the stage */
+.archive .caps { z-index: 2; }
+
+@media (max-width: 760px) {
+  .archive {
+    --g: min(76vw, 36vh);
+    grid-template-columns: 1fr var(--g) 1fr;
+    grid-template-rows: var(--g) var(--g);
+    row-gap: clamp(1.25rem, 4vh, 2.5rem);
+    padding-block: 6.5rem 4.5rem;
+  }
+  .tgrid-left, .tgrid-right { grid-column: 2; }
+  .tgrid-left { grid-row: 1; }
+  .tgrid-right { grid-row: 2; }
+  /* until the left grid has photographs, give the filled grid the stage */
+  .tgrid[data-empty='true'] { display: none; }
+  .archive:has(.tgrid-left[data-empty='true']) { --g: min(84vw, 58vh); grid-template-rows: var(--g); }
+  .archive:has(.tgrid-left[data-empty='true']) .tgrid-right { grid-row: 1; }
+}
+
 /* ---------- Project sheet ---------- */
 .sheet {
   width: 100vw;
@@ -381,6 +506,9 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .tile-pan img { animation: none; }
+  .tile-pan { transform: none; }
 }
