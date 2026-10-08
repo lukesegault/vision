@@ -15,8 +15,9 @@ const pad = (n) => String(n).padStart(2, '0');
    is shown instead.
 
    A tile can also carry real footage (`video` in src/data/textiles.js). The
-   still shows at rest; on hover the film plays over it, and on leave it fades
-   back to the still. The footage replaces the shader on that tile. */
+   still shows at rest; on hover the film plays once over it and holds its last
+   frame, and on leave it fades back to the still. The footage replaces the
+   shader on that tile. */
 function Tile({ tile, index, number, onActivate, onLoaded, active }) {
   const [state, setState] = useState('pending'); // pending | ready | missing
   const [live, setLive] = useState(false);       // the WebGL surface is showing
@@ -119,7 +120,6 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
             ref={film}
             className="tile-film"
             muted
-            loop
             playsInline
             preload="auto"
             disablePictureInPicture

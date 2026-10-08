@@ -5,10 +5,11 @@
    below give each material its own behaviour: leather catches long highlights,
    metal glints and ripples, fur drifts and bends, velvet's pile flattens.
 
-   A tile with `video: 'name'` plays public/textiles/name.webm (or .mp4) over
-   its still on hover, and fades back to the still when the pointer leaves.
-   The still should be the first frame of the film so nothing jumps; it
-   replaces the shader effect on that tile.
+   A tile with `video: 'name'` plays public/textiles/name.webm (or .mp4) once
+   over its still on hover, holds the last frame while the pointer stays, and
+   fades back to the still when it leaves. The still should be the first frame
+   of the film so nothing jumps; the film replaces the shader effect on that
+   tile.
 
    Each tile reads its image from public/textiles/<file>. A tile whose file is
    missing shows a quiet placeholder naming the file it is waiting for, so a

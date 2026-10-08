@@ -29,7 +29,7 @@ npm run preview    # serve the production build locally
   - **Floral embellishment**: sequins and rhinestones twinkle as the light moves.
   - **Velvet**: a pool of light follows the pointer, and the pile looks flattened behind the stroke and raised ahead of it.
   - **Snakeskin**: each scale catches the light.
-  - **Shearling**: real footage. Hovering plays a 10 second film of the fur swaying and being stroked by an unseen hand, over the still. When the pointer leaves, it fades back to the still.
+  - **Shearling**: real footage. Hovering plays a 2.5 second film of the fur being stroked by an unseen hand (it starts moving within half a second), over the still. It holds its last frame while the pointer stays, and fades back to the still when the pointer leaves.
   - **Denim**: a soft sheen along the twill and the stitching.
   - **Chainmail**: the metal discs glint, and the mesh ripples outward from the pointer when it moves.
   
@@ -41,12 +41,12 @@ npm run preview    # serve the production build locally
 
 Any tile can play a film on hover instead of the shader effect. The shearling tile does this today. In `src/data/textiles.js`, a tile with `video: 'shearling'` plays `public/textiles/shearling.webm` (with `shearling.mp4` as a fallback for browsers that cannot play WebM) over its still. The still, `shearling-still.jpg`, is the first frame of the film so that nothing jumps when playback starts.
 
-To prepare a new clip: crop it square, remove the audio, keep it under about 600 KB, and make its last frame match its first so it loops without a visible seam. For example, with ffmpeg:
+To prepare a new clip: pick the moment the movement starts and cut a few seconds from just before it (the film should react within about half a second of hovering), crop it square, remove the audio, and keep it under about 600 KB. The film plays once and holds its last frame, so it does not need to loop. For example, with ffmpeg (here cutting from 4.95 s for 2.45 s):
 
 ```sh
-ffmpeg -i clip.mp4 -an -vf "crop=720:720:280:0,scale=640:640" -c:v libx264 -crf 24 -pix_fmt yuv420p -movflags +faststart name.mp4
-ffmpeg -i clip.mp4 -an -vf "crop=720:720:280:0,scale=640:640" -c:v libvpx-vp9 -crf 34 -b:v 0 name.webm
-ffmpeg -i clip.mp4 -vf "crop=720:720:280:0,scale=640:640" -vframes 1 -q:v 2 name-still.jpg
+ffmpeg -ss 4.95 -t 2.45 -i clip.mp4 -an -vf "crop=720:720:280:0,scale=640:640" -c:v libx264 -crf 24 -pix_fmt yuv420p -movflags +faststart name.mp4
+ffmpeg -ss 4.95 -t 2.45 -i clip.mp4 -an -vf "crop=720:720:280:0,scale=640:640" -c:v libvpx-vp9 -crf 34 -b:v 0 name.webm
+ffmpeg -ss 4.95 -i clip.mp4 -vf "crop=720:720:280:0,scale=640:640" -vframes 1 -q:v 2 name-still.jpg
 ```
 
 (`crop=720:720:280:0` takes the centre square of a 1280 x 720 clip.) With reduced motion enabled, films do not play and the still stays.
