@@ -102,6 +102,14 @@ The rotating 3D rack of garments (woven rose suede outfit, studio lighting, plas
 
 `npm run build` produces a static `dist/` folder with relative paths, so it works on any static host, including a GitHub Pages project sub-path. For Netlify or Cloudflare Pages, use the build command `npm run build` and the publish directory `dist`.
 
+### GitHub Pages (set up)
+
+`.github/workflows/pages.yml` builds the site and publishes it every time you push to `main` or `claude/adoring-johnson-3kyato`, and it can also be run by hand from the Actions tab ("Run workflow"). The site appears at `https://<your-username>.github.io/vision/`.
+
+One-time setup: repository **Settings > Pages > Build and deployment > Source: GitHub Actions**. If you later change the repository's default branch, add it to the `branches` list in the workflow.
+
+The page contains `<meta name="robots" content="noindex, nofollow">` in `index.html`, which asks search engines not to list it while the content is still sample text. Remove that line when you launch.
+
 ## Notes
 
 - Fonts (Archivo) load from Google Fonts. To self-host, download the font files and replace the `<link>` in `index.html` with `@font-face` rules.
