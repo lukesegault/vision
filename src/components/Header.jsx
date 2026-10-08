@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { SERVICES } from '../data/services.js';
 import { ABOUT } from '../data/about.js';
-import { unscramble } from '../lib/scramble.js';
 
 const Caret = () => (
   <svg className="caret" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true">
@@ -32,47 +31,21 @@ function ServicesTable() {
   );
 }
 
-/* The phone number and email are not in the page until a visitor asks for
-   them: they are stored scrambled and put together here, on click. */
-function Contact() {
-  const c = ABOUT.contact;
-  const [details, setDetails] = useState(null);
-  const firstLink = useRef(null);
-
-  const show = () => setDetails({ phone: unscramble(c.phone), email: unscramble(c.email) });
-
-  // once revealed, move focus to the first link so keyboard and screen reader users land on it
-  useEffect(() => {
-    if (details) firstLink.current?.focus();
-  }, [details]);
-
-  return (
-    <section className="about-contact">
-      <h2>Contact</h2>
-      <ul>
-        {details ? (
-          <>
-            <li><a ref={firstLink} href={`tel:${details.phone.replace(/\s/g, '')}`}>{details.phone}</a></li>
-            <li><a href={`mailto:${details.email}`}>{details.email}</a></li>
-          </>
-        ) : (
-          <li><button type="button" className="reveal-btn" onClick={show}>Show phone and email</button></li>
-        )}
-        <li><a href={c.instagramUrl} target="_blank" rel="noopener noreferrer">{c.instagram}</a></li>
-        <li>{c.location}</li>
-      </ul>
-    </section>
-  );
-}
-
 function AboutPanel() {
+  const c = ABOUT.contact;
   return (
     <div className="about-grid">
       <section className="about-info">
         <h2>About</h2>
         <p>{ABOUT.information}</p>
       </section>
-      <Contact />
+      <section className="about-contact">
+        <h2>Contact</h2>
+        <ul>
+          <li><a href={c.instagramUrl} target="_blank" rel="noopener noreferrer">{c.instagram}</a></li>
+          <li>{c.location}</li>
+        </ul>
+      </section>
     </div>
   );
 }

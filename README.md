@@ -18,7 +18,7 @@ npm run preview    # serve the production build locally
 - **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically, with three equal spaces (left margin, middle, right margin) so the composition stays balanced at any screen width. On phones the grids stack, and a grid with no photographs yet stays hidden so a filled one gets the screen.
 - **Floating pills**: name and tagline, Services and About, with a background blur.
 - **Services menu**: a glass table of the six services (number, service, details). No pricing for now. The centre of the page shrinks, fades and blurs while a menu is open.
-- **About menu**: a short description, and contact details (phone, email, Instagram, Paris / Remote).
+- **About menu**: a short description, and contact (Instagram, Paris / Remote).
 
 ### How the swatches move
 
@@ -88,21 +88,15 @@ Use photographs of at least 1000px on the short side so they stay sharp on large
 | --- | --- |
 | The textile grids (files, captions, crops) | `src/data/textiles.js` |
 | The services (title and details) | `src/data/services.js` |
-| The About description and contact details | `src/data/about.js` (phone and email are scrambled, see below) |
+| The About description and contact | `src/data/about.js` |
 | Name, tagline and page title | `src/components/Header.jsx`, `index.html` |
 | Colours, type, spacing and grid size | `src/styles.css` (variables at the top; `--g` sets the grid size) |
 
 The Work section with project pages was removed until there is a portfolio to show. It is in the git history (for example commit fe74697) if you want it back.
 
-## Contact details and bots
+## Contact
 
-The phone number and email are not written anywhere in plain text: not in the page, not in the JavaScript, not in this repository's current files. They are stored scrambled in `src/data/about.js` and put back together in the browser only when a visitor clicks **Show phone and email** (see `src/lib/scramble.js`). The Instagram handle and "Paris / Remote" stay visible, since the handle is public anyway.
-
-This stops the common bots that read a page's source for anything shaped like an email address or phone number. It does not stop a person, or a bot that runs the page like a browser and clicks the button. The strongest protection is to use a dedicated contact address and number for the site (an alias that forwards to your own, or a second number) so the personal ones are never exposed.
-
-To change a value, run `npm run scramble -- "new value"` and paste the result into `src/data/about.js`.
-
-Note: earlier commits in the git history, from before this change, contain the plain details.
+The site shows only the Instagram handle and "Paris / Remote", so it carries no phone number or email address for bots to collect. To add contact details later, edit `src/data/about.js` and `AboutPanel` in `src/components/Header.jsx`. Anything written in a page is public to scrapers, so for an email address a contact form is safer than a plain `mailto:` link.
 
 ## Archived: the 3D clothing rack
 
