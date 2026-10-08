@@ -24,7 +24,7 @@ export const TEXTILES = {
     { id: 'velvet', file: 'velvet.jpg', fx: { bump: 0.6, diffuse: 0.15, gloss: 0, sheen: 0.55, nap: 0.7 }, name: 'Velvet', note: 'Sage green', alt: 'Close-up of soft green velvet' }
   ],
   right: [
-    { id: 'snakeskin', file: 'snakeskin.jpg', fx: { bump: 1.3, diffuse: 0.3, gloss: 0.45, shine: 42 }, name: 'Snakeskin', note: 'Printed, pale blue', alt: 'Close-up of a snakeskin pattern in pale blue and grey' },
+    { id: 'snakeskin', file: 'snakeskin-still.jpg', video: 'snakeskin', name: 'Snakeskin', note: 'Printed, pale blue', alt: 'Close-up of a snakeskin pattern in pale blue and grey' },
     { id: 'shearling', file: 'shearling-still.jpg', video: 'shearling', fx: { bump: 0.8, diffuse: 0.25, gloss: 0.08, shine: 8, warp: 0.012 }, name: 'Shearling', note: 'Cream, curled', alt: 'Close-up of textured cream shearling' },
     { id: 'denim', file: 'denim.jpg', fx: { bump: 1.4, diffuse: 0.3, gloss: 0.12, shine: 12 }, name: 'Woven denim', note: 'Indigo, interlaced', alt: 'Close-up of interlaced woven indigo denim' },
     { id: 'chainmail', file: 'chainmail.jpg', fx: { bump: 1.0, diffuse: 0.3, gloss: 0.7, shine: 55, metal: 0.8, glitter: 0.9, glitterCells: 90, glitterFrom: 0.5, ripple: 1 }, name: 'Chainmail', note: 'Silver, metal mesh', alt: 'Close-up of draped silver chainmail' }
