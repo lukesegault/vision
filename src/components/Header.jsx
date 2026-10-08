@@ -80,7 +80,7 @@ export default function Header({ menu, setMenu }) {
         <div className="pills">
           <div className="pill pill-brand">
             <a className="wordmark" href="./" aria-label="Luke Segault, home">Luke Segault</a>
-            <span className="tagline">Styling &amp; Curation</span>
+            <span className="tagline">Styling + Curation</span>
           </div>
           <button
             ref={servicesBtn}

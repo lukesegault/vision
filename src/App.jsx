@@ -11,7 +11,7 @@ export default function App() {
 
   return (
     <>
-      <h1 className="visually-hidden">Luke Segault, Styling &amp; Curation</h1>
+      <h1 className="visually-hidden">Luke Segault, Styling + Curation</h1>
       <Header menu={menu} setMenu={setMenu} />
       <main className={`stage${menu ? ' is-dimmed' : ''}`}>
         {showRack ? (

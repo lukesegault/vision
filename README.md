@@ -1,6 +1,6 @@
 # Luke Segault
 
-The website of Luke Segault, Styling & Curation: a single page on white with generous margins, floating pill navigation and glass menus.
+The website of Luke Segault, Styling + Curation: a single page on white with generous margins, floating pill navigation and glass menus.
 
 Built with React and Vite. The hero is the **Tactile Archive Grid**: two 2 x 2 grids of textile macro photographs, framed like swatches in an atelier. (The earlier 3D clothing-rack hero is archived, see below.)
 
