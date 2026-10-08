@@ -1,6 +1,6 @@
-# Vision
+# Luke Segault
 
-A single-page portfolio for a menswear personal stylist, on a white page with generous margins, floating pill navigation and glass menus.
+The website of Luke Segault, Styling & Curation: a single page on white with generous margins, floating pill navigation and glass menus.
 
 Built with React and Vite. The hero is the **Tactile Archive Grid**: two 2 x 2 grids of textile macro photographs, framed like swatches in an atelier. (The earlier 3D clothing-rack hero is archived, see below.)
 
@@ -16,9 +16,9 @@ npm run preview    # serve the production build locally
 ## What is on the page
 
 - **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically, with three equal spaces (left margin, middle, right margin) so the composition stays balanced at any screen width. On phones the grids stack, and a grid with no photographs yet stays hidden so a filled one gets the screen.
-- **Floating pills**: brand, Work and About, with a background blur.
-- **Work menu**: a glass table of projects (number, title, categories, year). Choosing a row opens a full-screen project sheet. The centre of the page shrinks, fades and blurs while a menu is open.
-- **About menu**: information, services, selected clients, collaborators and contact.
+- **Floating pills**: name and tagline, Services and About, with a background blur.
+- **Services menu**: a glass table of the six services (number, service, details). No pricing for now. The centre of the page shrinks, fades and blurs while a menu is open.
+- **About menu**: a short description, and contact details (phone, email, Instagram, Paris / Remote).
 
 ### How the swatches move
 
@@ -87,12 +87,12 @@ Use photographs of at least 1000px on the short side so they stay sharp on large
 | What | Where |
 | --- | --- |
 | The textile grids (files, captions, crops) | `src/data/textiles.js` |
-| Projects in the Work menu and their sheets | `src/data/projects.js` |
-| Information, services, clients, collaborators, contact | `src/data/about.js` |
+| The services (title and details) | `src/data/services.js` |
+| The About description and contact details | `src/data/about.js` |
 | Name, tagline and page title | `src/components/Header.jsx`, `index.html` |
 | Colours, type, spacing and grid size | `src/styles.css` (variables at the top; `--g` sets the grid size) |
 
-All text and credits in the data files are sample content (including the client and collaborator names). Replace them with your own before publishing. Project photos go in `public/projects/`, named after each project's `id`, for example `intrecciato-study-1.jpg`.
+The Work section with project pages was removed until there is a portfolio to show. It is in the git history (for example commit fe74697) if you want it back.
 
 ## Archived: the 3D clothing rack
 
@@ -108,7 +108,7 @@ The rotating 3D rack of garments (woven rose suede outfit, studio lighting, plas
 
 One-time setup: repository **Settings > Pages > Build and deployment > Source: GitHub Actions**. Do not accept GitHub's suggested "Jekyll" starter workflow on that page: it would build the repository as a Jekyll site and publish that over this one. If you later change the repository's default branch, add it to the `branches` list in the workflow.
 
-The page contains `<meta name="robots" content="noindex, nofollow">` in `index.html`, which asks search engines not to list it while the content is still sample text. Remove that line when you launch.
+The page contains `<meta name="robots" content="noindex, nofollow">` in `index.html`, which asks search engines not to list the site while it is a private preview. Remove that line when you are ready to launch.
 
 ## Notes
 

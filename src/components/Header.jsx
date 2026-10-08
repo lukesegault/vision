@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { PROJECTS } from '../data/projects.js';
+import { SERVICES } from '../data/services.js';
 import { ABOUT } from '../data/about.js';
 
 const Caret = () => (
@@ -8,28 +8,22 @@ const Caret = () => (
   </svg>
 );
 
-function WorkTable({ onOpen }) {
+function ServicesTable() {
   return (
-    <table className="work-table">
+    <table className="services-table">
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Title</th>
-          <th scope="col">Categories</th>
-          <th scope="col">Year</th>
+          <th scope="col">Service</th>
+          <th scope="col">Details</th>
         </tr>
       </thead>
       <tbody>
-        {PROJECTS.map((p, i) => (
-          <tr key={p.id} onClick={() => onOpen(p.id)}>
+        {SERVICES.map((s, i) => (
+          <tr key={s.title}>
             <td>{String(i + 1).padStart(2, '0')}</td>
-            <td>
-              <button type="button" onClick={(e) => { e.stopPropagation(); onOpen(p.id); }}>
-                {p.title}
-              </button>
-            </td>
-            <td>{p.categories.join(', ')}</td>
-            <td>{p.year}</td>
+            <td>{s.title}</td>
+            <td>{s.details}</td>
           </tr>
         ))}
       </tbody>
@@ -38,38 +32,28 @@ function WorkTable({ onOpen }) {
 }
 
 function AboutPanel() {
+  const c = ABOUT.contact;
   return (
     <div className="about-grid">
       <section className="about-info">
-        <h2>Information</h2>
+        <h2>About</h2>
         <p>{ABOUT.information}</p>
-      </section>
-      <section>
-        <h2>Services</h2>
-        <ul>{ABOUT.services.map((s) => <li key={s}>{s}</li>)}</ul>
-      </section>
-      <section>
-        <h2>Selected clients</h2>
-        <ul>{ABOUT.clients.map((s) => <li key={s}>{s}</li>)}</ul>
-      </section>
-      <section>
-        <h2>Collaborators</h2>
-        <ul>{ABOUT.collaborators.map((s) => <li key={s}>{s}</li>)}</ul>
       </section>
       <section className="about-contact">
         <h2>Contact</h2>
         <ul>
-          <li><a href={`mailto:${ABOUT.contact.email}`}>{ABOUT.contact.email}</a></li>
-          <li><a href={ABOUT.contact.instagram} target="_blank" rel="noopener noreferrer">Instagram</a></li>
-          <li>{ABOUT.contact.location}</li>
+          <li><a href={c.phoneHref}>{c.phone}</a></li>
+          <li><a href={`mailto:${c.email}`}>{c.email}</a></li>
+          <li><a href={c.instagramUrl} target="_blank" rel="noopener noreferrer">{c.instagram}</a></li>
+          <li>{c.location}</li>
         </ul>
       </section>
     </div>
   );
 }
 
-export default function Header({ menu, setMenu, onOpenProject }) {
-  const workBtn = useRef(null);
+export default function Header({ menu, setMenu }) {
+  const servicesBtn = useRef(null);
   const aboutBtn = useRef(null);
 
   // Escape closes the menu and returns focus to its button
@@ -77,7 +61,7 @@ export default function Header({ menu, setMenu, onOpenProject }) {
     if (!menu) return undefined;
     const onKey = (e) => {
       if (e.key === 'Escape') {
-        (menu === 'work' ? workBtn : aboutBtn).current?.focus();
+        (menu === 'services' ? servicesBtn : aboutBtn).current?.focus();
         setMenu(null);
       }
     };
@@ -93,18 +77,18 @@ export default function Header({ menu, setMenu, onOpenProject }) {
       <header className="site-header">
         <div className="pills">
           <div className="pill pill-brand">
-            <a className="wordmark" href="./" aria-label="Vision, home">Vision</a>
-            <span className="tagline">Menswear Styling + Creative Direction</span>
+            <a className="wordmark" href="./" aria-label="Luke Segault, home">Luke Segault</a>
+            <span className="tagline">Styling &amp; Curation</span>
           </div>
           <button
-            ref={workBtn}
+            ref={servicesBtn}
             type="button"
             className="pill pill-nav"
-            aria-expanded={menu === 'work'}
-            aria-controls="panel-work"
-            onClick={() => toggle('work')}
+            aria-expanded={menu === 'services'}
+            aria-controls="panel-services"
+            onClick={() => toggle('services')}
           >
-            Work <Caret />
+            Services <Caret />
           </button>
           <button
             ref={aboutBtn}
@@ -118,8 +102,8 @@ export default function Header({ menu, setMenu, onOpenProject }) {
           </button>
         </div>
 
-        <div id="panel-work" className={`panel panel-work${menu === 'work' ? ' is-open' : ''}`} inert={menu !== 'work'}>
-          <WorkTable onOpen={onOpenProject} />
+        <div id="panel-services" className={`panel panel-services${menu === 'services' ? ' is-open' : ''}`} inert={menu !== 'services'}>
+          <ServicesTable />
         </div>
         <div id="panel-about" className={`panel panel-about${menu === 'about' ? ' is-open' : ''}`} inert={menu !== 'about'}>
           <AboutPanel />

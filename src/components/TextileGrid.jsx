@@ -193,7 +193,7 @@ export default function TextileGrid() {
       <Grid side="right" tiles={TEXTILES.right} offset={TEXTILES.left.length} onActivate={setActive} activeId={active?.id} />
 
       <div className="caps">
-        <p className="cap cap-left">Textile archive<br />Menswear styling</p>
+        <p className="cap cap-left">Textile archive<br />Styling &amp; Curation</p>
         <div className="cap cap-center" aria-live="polite">
           {active ? (
             <>
