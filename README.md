@@ -106,7 +106,7 @@ The rotating 3D rack of garments (woven rose suede outfit, studio lighting, plas
 
 `.github/workflows/pages.yml` builds the site and publishes it every time you push to `main` or `claude/adoring-johnson-3kyato`, and it can also be run by hand from the Actions tab ("Run workflow"). The site appears at `https://<your-username>.github.io/vision/`.
 
-One-time setup: repository **Settings > Pages > Build and deployment > Source: GitHub Actions**. If you later change the repository's default branch, add it to the `branches` list in the workflow.
+One-time setup: repository **Settings > Pages > Build and deployment > Source: GitHub Actions**. Do not accept GitHub's suggested "Jekyll" starter workflow on that page: it would build the repository as a Jekyll site and publish that over this one. If you later change the repository's default branch, add it to the `branches` list in the workflow.
 
 The page contains `<meta name="robots" content="noindex, nofollow">` in `index.html`, which asks search engines not to list it while the content is still sample text. Remove that line when you launch.
 
