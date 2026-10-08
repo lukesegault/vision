@@ -3,6 +3,7 @@ import {
   TAU, S, smoothstep, sampleSections, loftSections, loftCurve, collarOnSurface, lapelOnSurface, frontStrip, frontZ
 } from './geometry.js';
 import { clothMaterial, trimMaterial, hangerMaterial } from './textures.js';
+import { isPlaster } from './look.js';
 
 /* Every garment is built with the centre of the rail at the origin, hanging
    straight down. +z is the front of the garment, +x runs along the rail. */
@@ -114,7 +115,7 @@ function buildShirtLike(spec, parts) {
   if (P.lapels) {
     // a touch lighter than the body so the edge reads
     const lapelMat = cloth.clone();
-    if (lapelMat.color) lapelMat.color.multiplyScalar(1.08);
+    if (lapelMat.color && !isPlaster) lapelMat.color.multiplyScalar(1.08); // plaster is one tone: shadow defines the edge
     for (const side of [-1, 1]) {
       parts.add(mesh(lapelOnSurface(sections, {
         side, top: -0.045, bottom: -(P.double ? 0.34 : 0.26),

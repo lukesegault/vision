@@ -7,6 +7,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RING_R } from './Rack.jsx';
+import { isPlaster } from './look.js';
 
 const FOCUS_POINT = new THREE.Vector3(0, 1.25, RING_R);
 
@@ -24,7 +25,8 @@ export default function Effects({ depthOfField = true }) {
     const ao = new GTAOPass(scene, camera, size.width, size.height);
     ao.output = GTAOPass.OUTPUT.Default;
     ao.blendIntensity = 1;
-    ao.updateGtaoMaterial({ radius: 0.28, distanceExponent: 1.6, thickness: 1.5, scale: 1.1, samples: 14, distanceFallOff: 1 });
+    // plaster relies on occlusion to model its forms, so it gets more of it
+    ao.updateGtaoMaterial({ radius: isPlaster ? 0.4 : 0.28, distanceExponent: 1.6, thickness: 1.5, scale: isPlaster ? 1.6 : 1.1, samples: 14, distanceFallOff: 1 });
     ao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 7, radiusExponent: 1, rings: 2, samples: 16 });
     ao.normalMaterial.side = THREE.DoubleSide;
     composer.addPass(ao);

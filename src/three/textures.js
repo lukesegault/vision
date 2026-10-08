@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { isPlaster, plasterTone } from './look.js';
 
 /* Procedural fabric. Everything is generated in the browser, so the project
    has no image or model files to load. UVs are in metres, so each texture's
@@ -161,9 +162,39 @@ const tint = (hex, toward, amount) => new THREE.Color(hex).lerp(new THREE.Color(
 const luma = (hex) => { const c = new THREE.Color(hex); return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b; };
 const sheenFor = (hex, k) => k * (0.25 + 0.75 * Math.min(1, luma(hex) * 3));
 
+/* Plaster look: one chalky, matte tone per piece with its surface detail
+   carried by relief alone (the weave, the knit stitch, a faint grain), the
+   way a sculptor would model it. Only weave pieces keep a colour. */
+function plasterMaterial(spec) {
+  return once(`plaster:${spec.id}`, () => {
+    const base = { side: THREE.DoubleSide, shadowSide: THREE.DoubleSide, metalness: 0, roughness: 1, sheenRoughness: 0.85 };
+    if (spec.fabric === 'weave') {
+      // a bolder weave than the realistic look, so the relief reads from afar
+      const t = once(`tex:weave-bold:${spec.color}`, () => weave(spec.color, 0.14));
+      return new THREE.MeshPhysicalMaterial({
+        ...base, color: spec.color, normalMap: t.normal, normalScale: new THREE.Vector2(1.5, 1.5),
+        sheen: 0.35, sheenColor: tint(spec.color, '#ffffff', 0.55)
+      });
+    }
+    const color = plasterTone(spec);
+    if (spec.fabric === 'knit') {
+      const t = once('tex:knit', () => knit());
+      return new THREE.MeshPhysicalMaterial({
+        ...base, color, normalMap: t.normal, normalScale: new THREE.Vector2(0.8, 0.8), sheen: 0.25, sheenColor: tint(color, '#ffffff', 0.6)
+      });
+    }
+    const t = once('tex:chalk', () => grain(0.5, 0.07, 1.4));
+    return new THREE.MeshPhysicalMaterial({
+      ...base, color, normalMap: t.normal, normalScale: new THREE.Vector2(0.55, 0.55), sheen: 0.25, sheenColor: tint(color, '#ffffff', 0.6)
+    });
+  });
+}
+
 /* Physically based cloth. `sheen` is the soft, fibre-scattered rim light that
    makes wool, cotton and suede read as fabric rather than plastic. */
-export function clothMaterial({ fabric, color }) {
+export function clothMaterial(spec) {
+  if (isPlaster) return plasterMaterial(spec);
+  const { fabric, color } = spec;
   return once(`cloth:${fabric}:${color}`, () => {
     const common = { side: THREE.DoubleSide, shadowSide: THREE.DoubleSide, metalness: 0 };
     switch (fabric) {
@@ -206,7 +237,9 @@ export function clothMaterial({ fabric, color }) {
   });
 }
 
-export const trimMaterial = once('trim', () => new THREE.MeshPhysicalMaterial({
-  color: '#1c1616', roughness: 0.28, metalness: 0.05, clearcoat: 0.6, clearcoatRoughness: 0.2
-}));
-export const hangerMaterial = once('hanger', () => new THREE.MeshStandardMaterial({ color: '#161616', roughness: 0.38, metalness: 0.7 }));
+export const trimMaterial = once('trim', () => (isPlaster
+  ? new THREE.MeshStandardMaterial({ color: '#b9b3a6', roughness: 1, metalness: 0 })
+  : new THREE.MeshPhysicalMaterial({ color: '#1c1616', roughness: 0.28, metalness: 0.05, clearcoat: 0.6, clearcoatRoughness: 0.2 })));
+export const hangerMaterial = once('hanger', () => new THREE.MeshStandardMaterial(
+  isPlaster ? { color: '#1b1b1b', roughness: 0.6, metalness: 0.2 } : { color: '#161616', roughness: 0.38, metalness: 0.7 }
+));

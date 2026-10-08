@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { RACK, STEP } from '../data/garments.js';
 import { buildGarment } from './builders.js';
 import { loadGarmentModel } from './models.js';
+import { isPlaster } from './look.js';
 
 export const RING_R = 1.5;
 export const RING_Y = 1.95;
@@ -15,7 +16,9 @@ const MAX_SWING = 0.2; // radians
 const wrap = (a) => ((((a + Math.PI) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) - Math.PI;
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
-const metal = new THREE.MeshStandardMaterial({ color: '#151515', metalness: 0.9, roughness: 0.3 });
+const metal = new THREE.MeshStandardMaterial(
+  isPlaster ? { color: '#1b1b1b', metalness: 0.2, roughness: 0.6 } : { color: '#151515', metalness: 0.9, roughness: 0.3 }
+);
 
 /* The rotating ring and the garments hanging from it. `ctrl` is a plain
    mutable object shared with the page (drag, buttons, caption).

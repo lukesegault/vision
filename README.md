@@ -21,6 +21,15 @@ npm run preview    # serve the production build locally
 - **The rack**: ten pieces on a circular rail, turning slowly. Drag or swipe to spin it, use the arrow buttons (or the left and right arrow keys) to step between pieces. The caption at the bottom names the piece at the front. The garments hang like real ones: each swings on its hook when the rack speeds up, slows down or is dragged, then settles, and a faint breeze keeps them from being perfectly still. With reduced motion enabled in the system settings, it does not turn on its own.
 - **Hero outfit**: a woven rose suede overshirt and trousers (inspired by intrecciato leatherwork) start at the front of the rack.
 
+## Two looks for the rack
+
+The rack has two art directions, set in `src/three/look.js`:
+
+- **Plaster (default)**: every garment is one matte, chalky neutral, like a sculpture, with detail carried by relief alone. Only the hero outfit, the woven rose pieces, carries colour, so it is the clear focal point. Tops are the lightest tone, coats a step down and trousers darker, so neighbouring pieces separate without colour.
+- **Realistic**: each piece in its own colour and fabric.
+
+Add `?look=realistic` to the address to compare. To change the default, edit the check at the top of `src/three/look.js`. The plaster tones are in `plasterTone` in the same file, and the rose is the `color` of the two weave pieces in `src/data/garments.js`.
+
 ## How the rendering works
 
 The look is built to resemble a studio photograph rather than a game scene:

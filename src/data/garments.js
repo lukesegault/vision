@@ -14,7 +14,7 @@ export const RACK = [
     id: 'intrecciato-overshirt',
     type: 'shirt',
     fabric: 'weave',
-    color: '#d89ba5',
+    color: '#d9a2aa',
     name: 'Intrecciato overshirt',
     note: 'Woven suede, rose',
     params: { length: 0.72, shoulder: 0.236, chest: 0.24, hem: 0.248, depth: 0.072, sleeve: 0.6, buttons: 5 }
@@ -23,7 +23,7 @@ export const RACK = [
     id: 'intrecciato-trousers',
     type: 'trousers',
     fabric: 'weave',
-    color: '#d89ba5',
+    color: '#d9a2aa',
     name: 'Intrecciato trousers',
     note: 'Woven suede, rose',
     params: { waist: 0.168, hip: 0.188, length: 1.0, knee: 0.098, hem: 0.092, flare: 0.004 }
