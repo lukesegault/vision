@@ -188,12 +188,12 @@ export default function TextileGrid() {
   }, []);
 
   return (
-    <section className="archive" data-active={active ? 'true' : undefined} aria-label="Textile archive">
+    <section className="archive" data-active={active ? 'true' : undefined} aria-label="Swatches">
       <Grid side="left" tiles={TEXTILES.left} offset={0} onActivate={setActive} activeId={active?.id} />
       <Grid side="right" tiles={TEXTILES.right} offset={TEXTILES.left.length} onActivate={setActive} activeId={active?.id} />
 
       <div className="caps">
-        <p className="cap cap-left">Textile archive<br />Styling &amp; Curation</p>
+        <p className="cap cap-left">Styling &amp; Curation</p>
         <div className="cap cap-center" aria-live="polite">
           {active ? (
             <>

@@ -9,7 +9,7 @@
   --line: rgb(0 0 0 / 0.1);
   --edge: clamp(0.6rem, 1vw, 0.85rem);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --sans: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -23,7 +23,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 400;
   line-height: 1.45;
   letter-spacing: 0.02em;
@@ -79,8 +79,6 @@ a { color: inherit; }
 .pill-brand { cursor: default; }
 .wordmark {
   font-weight: 800;
-  font-stretch: 125%;
-  font-variation-settings: 'wdth' 125;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
@@ -144,7 +142,7 @@ a { color: inherit; }
 .services-table th {
   padding: 0 0 0.9rem;
   text-align: left;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -169,7 +167,7 @@ a { color: inherit; }
   margin-bottom: 0.8rem;
   padding-bottom: 0.55rem;
   border-bottom: 1px solid var(--line);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -273,13 +271,13 @@ a { color: inherit; }
 /* ---------- Tactile Archive Grid ---------- */
 .archive {
   --cut: cubic-bezier(0.16, 1, 0.3, 1); /* a sharp, deliberate cut, never bouncy */
-  --g: min(32vw, 58vh, 600px);          /* side of each 2 x 2 grid */
+  --g: min(36vw, 64vh, 760px);          /* side of each 2 x 2 grid */
   --gap: clamp(6px, 0.55vw, 10px);
   position: absolute;
   inset: 0;
   display: grid;
-  /* three equal spaces: left margin, middle, right margin */
-  grid-template-columns: 1fr var(--g) 1fr var(--g) 1fr;
+  /* wide margins either side, a slightly narrower gap between the two grids */
+  grid-template-columns: 1.6fr var(--g) 1fr var(--g) 1.6fr;
   grid-template-rows: var(--g);
   align-content: center;
   padding-block: 4.5rem;
@@ -379,7 +377,7 @@ a { color: inherit; }
   position: absolute;
   left: 0.8rem;
   bottom: 0.7rem;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.04em;
   color: var(--muted);
 }
@@ -408,7 +406,8 @@ a { color: inherit; }
 
 @media (max-width: 760px) {
   .archive {
-    --g: min(76vw, 36vh);
+    /* two grids stacked: leave room for the header above and the caption below */
+    --g: min(86vw, calc((100vh - 15rem) / 2));
     grid-template-columns: 1fr var(--g) 1fr;
     grid-template-rows: var(--g) var(--g);
     row-gap: clamp(1.25rem, 4vh, 2.5rem);

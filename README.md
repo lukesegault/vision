@@ -15,7 +15,7 @@ npm run preview    # serve the production build locally
 
 ## What is on the page
 
-- **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically, with three equal spaces (left margin, middle, right margin) so the composition stays balanced at any screen width. On phones the grids stack, and a grid with no photographs yet stays hidden so a filled one gets the screen.
+- **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically and sized to the screen (about 36% of the width each, never taller than 64% of the height), with wide margins either side and a slightly narrower gap between them. On phones the grids stack, and a grid with no photographs yet stays hidden so a filled one gets the screen.
 - **Floating pills**: name and tagline, Services and About, with a background blur.
 - **Services menu**: a glass table of the six services (number, service, details). No pricing for now. The centre of the page shrinks, fades and blurs while a menu is open.
 - **About menu**: a short description, and contact (Instagram, Paris / Remote).
@@ -116,6 +116,6 @@ The page contains `<meta name="robots" content="noindex, nofollow">` in `index.h
 
 ## Notes
 
-- Fonts (Archivo) load from Google Fonts. To self-host, download the font files and replace the `<link>` in `index.html` with `@font-face` rules.
+- The site is set in Helvetica at 10px. It uses the font already on the visitor's device (Helvetica Neue on Mac and iPhone, Arial where Helvetica is missing, such as Windows and Android), so nothing is downloaded. Helvetica is a licensed font and cannot be bundled with the site.
 - Hover effects need a mouse. On touch screens, tapping a swatch gives the same effect and keeps it on until you tap another swatch or empty space.
 - Only the swatches without a film (five of the eight) use their own small WebGL context. Browsers allow around sixteen, so the grid is comfortably inside the limit.
