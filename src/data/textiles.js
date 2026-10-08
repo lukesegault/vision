@@ -7,10 +7,10 @@
    photographs are not square. */
 export const TEXTILES = {
   left: [
-    { id: 'leather-woven', file: 'leather-woven.jpg', name: 'Woven leather', note: 'Brown, hand woven', alt: 'Close-up of woven brown leather' },
-    { id: 'floral', file: 'floral.jpg', name: 'Floral embellishment', note: 'Pink, appliqué', alt: 'Close-up of pink floral embellishments' },
-    { id: 'leather-draped', file: 'leather-draped.jpg', name: 'Draped leather', note: 'Black', alt: 'Close-up of draped black leather' },
-    { id: 'velvet', file: 'velvet.jpg', name: 'Velvet', note: 'Soft green', alt: 'Close-up of soft green velvet' }
+    { id: 'leather-woven', file: 'leather-woven.jpg', name: 'Woven leather', note: 'Aubergine, interlaced', alt: 'Close-up of interlaced woven leather in deep aubergine brown' },
+    { id: 'floral', file: 'floral.jpg', name: 'Floral embellishment', note: 'Pink, beaded and sequinned', alt: 'Close-up of pink floral embellishments' },
+    { id: 'leather-draped', file: 'leather-draped.jpg', focus: '50% 58%', name: 'Draped leather', note: 'Black, full grain', alt: 'Close-up of draped black leather' },
+    { id: 'velvet', file: 'velvet.jpg', name: 'Velvet', note: 'Sage green', alt: 'Close-up of soft green velvet' }
   ],
   right: [
     { id: 'snakeskin', file: 'snakeskin.jpg', name: 'Snakeskin', note: 'Printed, pale blue', alt: 'Close-up of a snakeskin pattern in pale blue and grey' },

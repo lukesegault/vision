@@ -15,7 +15,7 @@ npm run preview    # serve the production build locally
 
 ## What is on the page
 
-- **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically, with three equal spaces (left margin, middle, right margin) so the composition stays balanced at any screen width. On phones the grids stack, and a grid with no photographs yet stays hidden so the filled one gets the screen.
+- **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically, with three equal spaces (left margin, middle, right margin) so the composition stays balanced at any screen width. On phones the grids stack, and a grid with no photographs yet stays hidden so a filled one gets the screen.
 - **Floating pills**: brand, Work and About, with a background blur.
 - **Work menu**: a glass table of projects (number, title, categories, year). Choosing a row opens a full-screen project sheet. The centre of the page shrinks, fades and blurs while a menu is open.
 - **About menu**: information, services, selected clients, collaborators and contact.
@@ -33,10 +33,10 @@ Put images in `public/textiles/`. The grid is defined in `src/data/textiles.js`:
 
 | Grid | Files |
 | --- | --- |
-| Right (filled) | `snakeskin.jpg`, `shearling.jpg`, `denim.jpg`, `chainmail.jpg` |
-| Left (waiting for photographs) | `leather-woven.jpg`, `floral.jpg`, `leather-draped.jpg`, `velvet.jpg` |
+| Left | `leather-woven.jpg`, `floral.jpg`, `leather-draped.jpg`, `velvet.jpg` |
+| Right | `snakeskin.jpg`, `shearling.jpg`, `denim.jpg`, `chainmail.jpg` |
 
-A tile with no file shows a quiet placeholder naming the file it is waiting for, so you can fill the left grid one image at a time. To use a different file name, change `file` in `src/data/textiles.js`.
+Tiles read top-left, top-right, bottom-left, bottom-right. A tile with no file shows a quiet placeholder naming the file it is waiting for, so a grid can be filled one image at a time. To use a different file name, change `file` in `src/data/textiles.js`.
 
 Use photographs of at least 1000px on the short side so they stay sharp on large screens. Squares crop from the middle by default, so keep the interesting part of the fabric centred.
 
