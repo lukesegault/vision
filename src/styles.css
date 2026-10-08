@@ -176,7 +176,7 @@ a { color: inherit; }
   color: var(--muted);
 }
 .about-grid li { padding: 0.1rem 0; }
-.about-grid p { max-width: 30rem; }
+.about-grid p { max-width: 36rem; }
 .about-contact a { text-underline-offset: 3px; }
 
 @media (max-width: 700px) {

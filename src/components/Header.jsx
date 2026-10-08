@@ -37,7 +37,11 @@ function AboutPanel() {
     <div className="about-grid">
       <section className="about-info">
         <h2>About</h2>
-        <p>{ABOUT.information}</p>
+        <p>
+          {ABOUT.information.map((line, i) => (
+            <span key={line}>{i > 0 && <br />}{line}</span>
+          ))}
+        </p>
       </section>
       <section className="about-contact">
         <h2>Contact</h2>
