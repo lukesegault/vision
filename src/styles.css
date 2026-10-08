@@ -271,7 +271,7 @@ a { color: inherit; }
 /* ---------- Tactile Archive Grid ---------- */
 .archive {
   --cut: cubic-bezier(0.16, 1, 0.3, 1); /* a sharp, deliberate cut, never bouncy */
-  --g: min(36vw, 64vh, 760px);          /* side of each 2 x 2 grid */
+  --g: min(39.5vw, 68vh, 840px);        /* side of each 2 x 2 grid */
   --gap: clamp(6px, 0.55vw, 10px);
   position: absolute;
   inset: 0;
@@ -407,11 +407,11 @@ a { color: inherit; }
 @media (max-width: 760px) {
   .archive {
     /* two grids stacked: leave room for the header above and the caption below */
-    --g: min(86vw, calc((100vh - 15rem) / 2));
+    --g: min(88vw, calc((100dvh - 13.5rem) / 2));
     grid-template-columns: 1fr var(--g) 1fr;
     grid-template-rows: var(--g) var(--g);
     row-gap: clamp(1.25rem, 4vh, 2.5rem);
-    padding-block: 6.5rem 4.5rem;
+    padding-block: 7rem 4rem;
   }
   .tgrid-left, .tgrid-right { grid-column: 2; }
   .tgrid-left { grid-row: 1; }

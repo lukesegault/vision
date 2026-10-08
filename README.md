@@ -15,7 +15,7 @@ npm run preview    # serve the production build locally
 
 ## What is on the page
 
-- **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically and sized to the screen (about 36% of the width each, never taller than 64% of the height), with wide margins either side and a slightly narrower gap between them. On phones the grids stack, and a grid with no photographs yet stays hidden so a filled one gets the screen.
+- **Tactile Archive Grid**: two perfectly square 2 x 2 grids, centred vertically and sized to the screen (about 39.5% of the width each, never taller than 68% of the height), with wide margins either side and a slightly narrower gap between them. On phones the grids stack, and a grid with no photographs yet stays hidden so a filled one gets the screen.
 - **Floating pills**: name and tagline, Services and About, with a background blur.
 - **Services menu**: a glass table of the six services (number, service, details). No pricing for now. The centre of the page shrinks, fades and blurs while a menu is open.
 - **About menu**: a short description, and contact (Instagram, Paris / Remote).
