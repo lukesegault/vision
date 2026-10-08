@@ -178,6 +178,15 @@ a { color: inherit; }
 .about-grid li { padding: 0.1rem 0; }
 .about-grid p { max-width: 30rem; }
 .about-contact a { text-underline-offset: 3px; }
+.reveal-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.reveal-btn:hover { text-decoration-thickness: 2px; }
 
 @media (max-width: 700px) {
   .panel { padding: 1.25rem 1.1rem 1.5rem; }
