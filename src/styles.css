@@ -352,6 +352,21 @@ a { color: inherit; }
 }
 .has-image .tile-pan img { opacity: 1; }
 
+/* real footage fades in over the still while the tile is hovered or focused */
+.tile-pan video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s var(--cut);
+  animation: breathe var(--dur, 20s) ease-in-out var(--delay, 0s) infinite;
+}
+.is-playing .tile-pan video { opacity: 1; transition-duration: 0.4s; }
+
 /* the live (WebGL) surface sits on the photograph and takes over once ready */
 .tile-pan canvas {
   position: absolute;
@@ -523,6 +538,7 @@ a { color: inherit; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .tile-pan img, .tile-pan canvas { animation: none; }
+  .tile-pan img, .tile-pan canvas, .tile-pan video { animation: none; }
+  .tile-pan video { display: none; }
   .tile-pan { transform: none; }
 }

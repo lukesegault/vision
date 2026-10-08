@@ -29,13 +29,29 @@ npm run preview    # serve the production build locally
   - **Floral embellishment**: sequins and rhinestones twinkle as the light moves.
   - **Velvet**: a pool of light follows the pointer, and the pile looks flattened behind the stroke and raised ahead of it.
   - **Snakeskin**: each scale catches the light.
-  - **Shearling**: the fibres drift in a slight breeze and bend the way the hand moves.
+  - **Shearling**: real footage. Hovering plays a 10 second film of the fur swaying and being stroked by an unseen hand, over the still. When the pointer leaves, it fades back to the still.
   - **Denim**: a soft sheen along the twill and the stitching.
   - **Chainmail**: the metal discs glint, and the mesh ripples outward from the pointer when it moves.
   
   At rest every swatch is exactly the photograph, and the effect eases out when the pointer leaves. Nothing runs unless the pointer is over a swatch.
 - **Easing**: the CSS uses one sharp curve, `cubic-bezier(0.16, 1, 0.3, 1)`, for a crisp, deliberate feel, never bouncy. The swatches also appear with a clean cut, wiped in one after another.
 - **Fallbacks**: without WebGL the plain photographs are shown (the fade, pan and breathing still work). With reduced motion enabled in the system settings, the live effects, breathing, panning and reveal are all switched off.
+
+### Real footage on a swatch
+
+Any tile can play a film on hover instead of the shader effect. The shearling tile does this today. In `src/data/textiles.js`, a tile with `video: 'shearling'` plays `public/textiles/shearling.webm` (with `shearling.mp4` as a fallback for browsers that cannot play WebM) over its still. The still, `shearling-still.jpg`, is the first frame of the film so that nothing jumps when playback starts.
+
+To prepare a new clip: crop it square, remove the audio, keep it under about 600 KB, and make its last frame match its first so it loops without a visible seam. For example, with ffmpeg:
+
+```sh
+ffmpeg -i clip.mp4 -an -vf "crop=720:720:280:0,scale=640:640" -c:v libx264 -crf 24 -pix_fmt yuv420p -movflags +faststart name.mp4
+ffmpeg -i clip.mp4 -an -vf "crop=720:720:280:0,scale=640:640" -c:v libvpx-vp9 -crf 34 -b:v 0 name.webm
+ffmpeg -i clip.mp4 -vf "crop=720:720:280:0,scale=640:640" -vframes 1 -q:v 2 name-still.jpg
+```
+
+(`crop=720:720:280:0` takes the centre square of a 1280 x 720 clip.) With reduced motion enabled, films do not play and the still stays.
+
+The original photograph, `public/textiles/shearling.jpg`, is no longer used. To go back to it, set `file: 'shearling.jpg'` and remove `video` from that tile.
 
 ### Tuning a fabric
 
@@ -60,7 +76,7 @@ Put images in `public/textiles/`. The grid is defined in `src/data/textiles.js`:
 | Grid | Files |
 | --- | --- |
 | Left | `leather-woven.jpg`, `floral.jpg`, `leather-draped.jpg`, `velvet.jpg` |
-| Right | `snakeskin.jpg`, `shearling.jpg`, `denim.jpg`, `chainmail.jpg` |
+| Right | `snakeskin.jpg`, `shearling-still.jpg` (with `shearling.webm` and `shearling.mp4`), `denim.jpg`, `chainmail.jpg` |
 
 Tiles read top-left, top-right, bottom-left, bottom-right. A tile with no file shows a quiet placeholder naming the file it is waiting for, so a grid can be filled one image at a time. To use a different file name, change `file` in `src/data/textiles.js`.
 
@@ -90,4 +106,4 @@ The rotating 3D rack of garments (woven rose suede outfit, studio lighting, plas
 
 - Fonts (Archivo) load from Google Fonts. To self-host, download the font files and replace the `<link>` in `index.html` with `@font-face` rules.
 - Hover effects need a mouse. On touch screens, touching or dragging across a swatch gives the same effect.
-- Each swatch uses its own small WebGL context (eight in total). Browsers allow around sixteen, so the grid is comfortably inside the limit.
+- Each swatch except the shearling uses its own small WebGL context (seven in total). Browsers allow around sixteen, so the grid is comfortably inside the limit.

@@ -5,6 +5,11 @@
    below give each material its own behaviour: leather catches long highlights,
    metal glints and ripples, fur drifts and bends, velvet's pile flattens.
 
+   A tile with `video: 'name'` plays public/textiles/name.webm (or .mp4) over
+   its still on hover, and fades back to the still when the pointer leaves.
+   The still should be the first frame of the film so nothing jumps; it
+   replaces the shader effect on that tile.
+
    Each tile reads its image from public/textiles/<file>. A tile whose file is
    missing shows a quiet placeholder naming the file it is waiting for, so a
    grid can be filled one image at a time. `focus` is where the square crop
@@ -19,7 +24,7 @@ export const TEXTILES = {
   ],
   right: [
     { id: 'snakeskin', file: 'snakeskin.jpg', fx: { bump: 1.3, diffuse: 0.3, gloss: 0.45, shine: 42 }, name: 'Snakeskin', note: 'Printed, pale blue', alt: 'Close-up of a snakeskin pattern in pale blue and grey' },
-    { id: 'shearling', file: 'shearling.jpg', fx: { bump: 0.8, diffuse: 0.25, gloss: 0.08, shine: 8, warp: 0.012 }, name: 'Shearling', note: 'Cream, curled', alt: 'Close-up of textured cream shearling' },
+    { id: 'shearling', file: 'shearling-still.jpg', video: 'shearling', fx: { bump: 0.8, diffuse: 0.25, gloss: 0.08, shine: 8, warp: 0.012 }, name: 'Shearling', note: 'Cream, curled', alt: 'Close-up of textured cream shearling' },
     { id: 'denim', file: 'denim.jpg', fx: { bump: 1.4, diffuse: 0.3, gloss: 0.12, shine: 12 }, name: 'Woven denim', note: 'Indigo, interlaced', alt: 'Close-up of interlaced woven indigo denim' },
     { id: 'chainmail', file: 'chainmail.jpg', fx: { bump: 1.0, diffuse: 0.3, gloss: 0.7, shine: 55, metal: 0.8, glitter: 0.9, glitterCells: 90, glitterFrom: 0.5, ripple: 1 }, name: 'Chainmail', note: 'Silver, metal mesh', alt: 'Close-up of draped silver chainmail' }
   ]

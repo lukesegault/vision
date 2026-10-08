@@ -12,7 +12,11 @@ const pad = (n) => String(n).padStart(2, '0');
    The photograph is drawn by a small WebGL surface (src/lib/textileGL.js) that
    makes it react to the pointer like the real material. If WebGL is not
    available, or the system asks for reduced motion, the plain <img> underneath
-   is shown instead. */
+   is shown instead.
+
+   A tile can also carry real footage (`video` in src/data/textiles.js). The
+   still shows at rest; on hover the film plays over it, and on leave it fades
+   back to the still. The footage replaces the shader on that tile. */
 function Tile({ tile, index, number, onActivate, onLoaded, active }) {
   const [state, setState] = useState('pending'); // pending | ready | missing
   const [live, setLive] = useState(false);       // the WebGL surface is showing
@@ -20,9 +24,32 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
   const canvas = useRef(null);
   const surface = useRef(null);
   const raf = useRef(0);
+  const film = useRef(null);
+  const filmTimer = useRef(0);
+  const [playing, setPlaying] = useState(false);
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const startFilm = () => {
+    const v = film.current;
+    if (!v || reduced()) return;
+    clearTimeout(filmTimer.current);
+    if (v.paused) v.currentTime = 0;
+    const p = v.play();
+    if (p?.catch) p.catch(() => {});
+    setPlaying(true);
+  };
+  const stopFilm = () => {
+    const v = film.current;
+    if (!v) return;
+    setPlaying(false);
+    // let it fade out first, then rewind so the next hover starts from the still
+    clearTimeout(filmTimer.current);
+    filmTimer.current = setTimeout(() => { v.pause(); v.currentTime = 0; }, 800);
+  };
+  useEffect(() => () => clearTimeout(filmTimer.current), []);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    if (tile.video || reduced()) return undefined;
     const s = createTextileSurface(canvas.current, {
       src: `${BASE}textiles/${tile.file}`,
       focus: tile.focus,
@@ -63,15 +90,15 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
 
   return (
     <figure
-      className={`tile${active ? ' is-active' : ''}${state === 'ready' ? ' has-image' : ''}${live ? ' has-gl' : ''}`}
+      className={`tile${active ? ' is-active' : ''}${state === 'ready' ? ' has-image' : ''}${live ? ' has-gl' : ''}${playing ? ' is-playing' : ''}`}
       style={style}
       tabIndex={0}
       aria-label={`${pad(number)}, ${tile.name}, ${tile.note}`}
-      onPointerEnter={(e) => { onActivate(tile); surface.current?.enter(e); }}
-      onPointerLeave={() => { onActivate(null); rest(); surface.current?.leave(); }}
+      onPointerEnter={(e) => { onActivate(tile); surface.current?.enter(e); startFilm(); }}
+      onPointerLeave={() => { onActivate(null); rest(); surface.current?.leave(); stopFilm(); }}
       onPointerMove={(e) => { track(e); surface.current?.move(e); }}
-      onFocus={() => onActivate(tile)}
-      onBlur={() => onActivate(null)}
+      onFocus={() => { onActivate(tile); startFilm(); }}
+      onBlur={() => { onActivate(null); stopFilm(); }}
     >
       <span className="tile-ph" aria-hidden="true">
         <span className="tile-ph-file">{tile.file}</span>
@@ -86,6 +113,22 @@ function Tile({ tile, index, number, onActivate, onLoaded, active }) {
             onLoad={() => { setState('ready'); onLoaded(); }}
             onError={() => setState('missing')}
           />
+        )}
+        {tile.video && state === 'ready' && (
+          <video
+            ref={film}
+            className="tile-film"
+            muted
+            loop
+            playsInline
+            preload="auto"
+            disablePictureInPicture
+            aria-hidden="true"
+            tabIndex={-1}
+          >
+            <source src={`${BASE}textiles/${tile.video}.webm`} type="video/webm" />
+            <source src={`${BASE}textiles/${tile.video}.mp4`} type="video/mp4" />
+          </video>
         )}
         <canvas ref={canvas} aria-hidden="true" />
       </div>
