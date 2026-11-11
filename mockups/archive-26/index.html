@@ -9,12 +9,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root {
-  --bg: #04100f;
+  --bg: #f7fbfa;
+  --ink: #06201f;
   --petrol: #0b3b3f;
   --cyan: #2f7f95;
   --frost: #b9d8cc;
   --white: #e8f3f1;
-  --line: rgba(185, 216, 204, .22);
+  --line: rgba(6, 32, 31, .16);
   --serif: "Cormorant Garamond", "Times New Roman", serif;
   --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -23,7 +24,7 @@
 html { background: var(--bg); scroll-behavior: smooth; }
 body {
   background: var(--bg);
-  color: var(--white);
+  color: var(--ink);
   font: 400 14px/1.5 var(--sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -35,8 +36,8 @@ button { font: inherit; color: inherit; }
 body::after {
   content: "";
   position: fixed; inset: 0; z-index: 90; pointer-events: none;
-  opacity: .16; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .mono { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
@@ -47,7 +48,7 @@ header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 14px 20px;
-  background: rgba(4, 16, 15, .55);
+  background: rgba(247, 251, 250, .72);
   -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
   border-bottom: 1px solid var(--line);
 }
@@ -62,8 +63,8 @@ nav a:hover { opacity: 1; }
   position: relative; min-height: 100svh; overflow: hidden;
   display: flex; align-items: flex-end;
   background:
-    radial-gradient(60% 50% at 72% 38%, rgba(185, 216, 204, .55), transparent 70%),
-    linear-gradient(95deg, #031412 0%, #0b3b3f 38%, #2f7f95 74%, #8fc4c6 100%);
+    radial-gradient(60% 50% at 72% 38%, rgba(255, 255, 255, .7), transparent 70%),
+    linear-gradient(95deg, #f7fbfa 0%, #e1efec 34%, #a9d4d2 66%, #5fa8b6 100%);
 }
 .hero::before { /* light bar */
   content: ""; position: absolute; top: 0; bottom: 0; left: 64%; width: 3.5%;
@@ -73,14 +74,14 @@ nav a:hover { opacity: 1; }
 .hero .fog, .tile .fog {
   position: absolute; inset: -20%;
   background:
-    radial-gradient(40% 30% at 20% 70%, rgba(185, 216, 204, .28), transparent 70%),
-    radial-gradient(50% 35% at 80% 80%, rgba(232, 243, 241, .22), transparent 70%);
+    radial-gradient(40% 30% at 20% 70%, rgba(255, 255, 255, .45), transparent 70%),
+    radial-gradient(50% 35% at 80% 80%, rgba(255, 255, 255, .35), transparent 70%);
   animation: drift 22s ease-in-out infinite alternate;
 }
 @keyframes drift { to { transform: translate3d(6%, -3%, 0) scale(1.08); } }
 .hero svg.figure {
   position: absolute; right: 12%; bottom: 0; height: 88%; width: auto;
-  filter: drop-shadow(0 0 28px rgba(185, 216, 204, .35));
+  filter: drop-shadow(0 0 24px rgba(255, 255, 255, .6));
 }
 .hero-copy { position: relative; z-index: 2; padding: 0 20px 48px; max-width: 760px; }
 .hero h1 {
@@ -90,24 +91,24 @@ nav a:hover { opacity: 1; }
 .hero p { max-width: 420px; opacity: .85; margin-bottom: 22px; }
 .btn {
   display: inline-block; padding: 12px 22px;
-  border: 1px solid var(--frost); color: var(--white);
-  background: rgba(4, 16, 15, .25);
+  border: 1px solid var(--ink); color: var(--ink);
+  background: rgba(255, 255, 255, .35);
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   transition: background .35s, color .35s;
 }
-.btn:hover { background: var(--frost); color: var(--bg); }
+.btn:hover { background: var(--ink); color: var(--bg); }
 .rec {
   position: absolute; top: 76px; right: 20px; z-index: 3;
   display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
-  text-shadow: 0 0 8px rgba(4, 16, 15, .8);
+  
 }
-.rec .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #d9f2e6; margin-right: 8px; animation: blink 1.6s steps(2) infinite; }
+.rec .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #1f7a6e; margin-right: 8px; animation: blink 1.6s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 .scan::after, .tile::after {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s;
   background: repeating-linear-gradient(0deg, rgba(4, 16, 15, .38) 0 1px, transparent 1px 3px);
 }
-.hero.scan::after { opacity: .5; }
+.hero.scan::after { opacity: .12; }
 
 /* section headers */
 .sec-head {
@@ -127,7 +128,7 @@ nav a:hover { opacity: 1; }
   grid-column: span var(--w, 1); grid-row: span var(--h, 1);
   background:
     radial-gradient(70% 55% at 55% 28%, var(--glow), transparent 70%),
-    linear-gradient(180deg, var(--top) 0%, var(--mid) 55%, var(--low) 100%);
+    linear-gradient(180deg, var(--top) 0%, var(--low) 100%);
   filter: blur(10px) saturate(.7); opacity: .4;
   transition: filter 1.1s cubic-bezier(.16, 1, .3, 1), opacity 1.1s;
 }
@@ -146,15 +147,15 @@ nav a:hover { opacity: 1; }
 .tile:hover svg.sil { transform: translateX(-50%) scale(1.04); }
 .tile .brand {
   position: absolute; right: 12px; bottom: 34px; z-index: 2;
-  font-size: clamp(11px, 1.35vw, 17px); letter-spacing: .3em; color: var(--frost); opacity: .92;
-  text-align: right;
+  font-size: clamp(11px, 1.35vw, 17px); letter-spacing: .3em; color: #fff; opacity: .95;
+  text-align: right; text-shadow: 0 0 10px rgba(6, 40, 44, .45);
 }
 .tile .cap {
   position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 2;
-  display: flex; justify-content: space-between; gap: 8px; color: var(--white); opacity: .85;
-  font-size: 10px;
+  display: flex; justify-content: space-between; gap: 8px; color: #fff; opacity: .92;
+  font-size: 10px; text-shadow: 0 0 8px rgba(6, 40, 44, .5);
 }
-.tile .tc { position: absolute; left: 12px; top: 10px; z-index: 2; font-size: 10px; opacity: .8; }
+.tile .tc { position: absolute; left: 12px; top: 10px; z-index: 2; font-size: 10px; opacity: .85; color: #fff; }
 .tile.wide .brand { font-size: clamp(14px, 2vw, 26px); }
 
 /* specimen */
@@ -166,10 +167,9 @@ nav a:hover { opacity: 1; }
 .wall .tile { grid-column: auto; grid-row: auto; filter: none; opacity: 1; }
 .wall .tile:first-child { grid-row: 1 / span 3; }
 .wall .crt {
-  border: 6px solid #0a1a19; box-shadow: inset 0 0 0 1px var(--line), inset 0 0 40px rgba(4, 16, 15, .7);
+  border: 6px solid #e4efed; box-shadow: inset 0 0 0 1px rgba(6, 32, 31, .25), inset 0 0 40px rgba(6, 40, 44, .35);
   border-radius: 10px;
 }
-.wall .crt.t { outline: 1px solid var(--line); }
 .spec { padding: 56px clamp(20px, 4vw, 56px); display: flex; flex-direction: column; gap: 22px; }
 .spec h3 { font-size: clamp(24px, 3vw, 38px); line-height: 1.15; }
 .spec dl { display: grid; grid-template-columns: 9em 1fr; border-top: 1px solid var(--line); }
@@ -181,15 +181,15 @@ nav a:hover { opacity: 1; }
 /* journal */
 .journal { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
 .card { position: relative; min-height: 420px; padding: 24px 20px; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; overflow: hidden; }
-.card:nth-child(1) { background: linear-gradient(160deg, #0b3b3f, #04100f 80%); }
-.card:nth-child(2) { background: linear-gradient(200deg, #2f7f95, #0b3b3f 60%, #04100f); }
+.card:nth-child(1) { background: linear-gradient(160deg, #eaf4f2, #bcd9d6); }
+.card:nth-child(2) { background: linear-gradient(200deg, #8fc4cc, #dcecea 70%, #f7fbfa); }
 .card h3 { font-size: clamp(22px, 2.6vw, 34px); line-height: 1.15; position: relative; z-index: 1; }
 .card p { max-width: 420px; opacity: .8; position: relative; z-index: 1; }
-.card .num { position: absolute; top: 12px; right: 16px; font-family: var(--serif); font-size: 140px; line-height: 1; opacity: .13; }
+.card .num { position: absolute; top: 12px; right: 16px; font-family: var(--serif); font-size: 140px; line-height: 1; opacity: .12; }
 
 footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 36px 20px 48px; border-top: 1px solid var(--line); opacity: .75; }
 
-a:focus-visible, .btn:focus-visible { outline: 2px solid var(--frost); outline-offset: 3px; }
+a:focus-visible, .btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
 @media (max-width: 800px) {
   nav { display: none; }
@@ -293,19 +293,19 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--frost); outline-o
 <script>
 (function () {
   var items = [
-    { b: 'Voss & Hale',  s: 'SS 1999', c: 'Italy',  z: '40', p: 1480, k: 'dress',  w: 2, h: 2, t: ['#9fd0cc','#1c6670','#031412'], g: 'rgba(232,243,241,.55)', x: '20%' },
-    { b: 'Marenko',      s: 'FW 1998', c: 'Italy',  z: '38', p: 920,  k: 'coat',   w: 2, h: 1, t: ['#6db0bf','#0b3b3f','#031412'], g: 'rgba(185,216,204,.4)',  x: '70%' },
-    { b: 'Orlov',        s: 'SS 2000', c: 'France', z: '37', p: 640,  k: 'heel',   w: 2, h: 1, t: ['#4a9aa8','#0b3b3f','#04100f'], g: 'rgba(232,243,241,.35)', x: '30%' },
-    { b: 'Niven',        s: 'FW 1997', c: 'UK',     z: '44', p: 780,  k: 'jacket', w: 1, h: 2, t: ['#3f8f9a','#0a3135','#04100f'], g: 'rgba(185,216,204,.35)', x: '60%' },
-    { b: 'Tessari',      s: 'SS 2001', c: 'Italy',  z: 'OS', p: 410,  k: 'bag',    w: 1, h: 1, t: ['#8bc7b5','#1a5a55','#04100f'], g: 'rgba(232,243,241,.45)', x: '15%' },
-    { b: 'Kalder',       s: 'FW 2002', c: 'Japan',  z: '36', p: 560,  k: 'coat',   w: 1, h: 1, t: ['#5fa6c0','#10404a','#04100f'], g: 'rgba(185,216,204,.3)',  x: '75%' },
-    { b: 'Strata',       s: 'SS 2003', c: 'Belgium',z: 'OS', p: 350,  k: 'bag',    w: 1, h: 1, t: ['#7bbab8','#14504f','#04100f'], g: 'rgba(232,243,241,.4)',  x: '80%' },
-    { b: 'Aurelie Vant', s: 'SS 1998', c: 'France', z: '38', p: 1190, k: 'dress',  w: 2, h: 2, t: ['#a8d8c6','#1e6a62','#031412'], g: 'rgba(232,243,241,.5)',  x: '68%' },
-    { b: 'Helix',        s: 'FW 1999', c: 'Italy',  z: '42', p: 830,  k: 'jacket', w: 2, h: 1, t: ['#4b9bb3','#0b3b3f','#04100f'], g: 'rgba(185,216,204,.4)',  x: '25%' },
-    { b: 'Duomo 9',      s: 'FW 2000', c: 'Italy',  z: '39', p: 590,  k: 'heel',   w: 1, h: 1, t: ['#3e8c9c','#0a3236','#04100f'], g: 'rgba(185,216,204,.3)',  x: '40%' },
-    { b: 'Selene',       s: 'FW 2001', c: 'Italy',  z: '46', p: 1340, k: 'coat',   w: 1, h: 1, t: ['#58a4b6','#0c3c43','#04100f'], g: 'rgba(185,216,204,.4)',  x: '22%' },
-    { b: 'Vesper',       s: 'SS 2002', c: 'Spain',  z: '38', p: 470,  k: 'heel',   w: 1, h: 1, t: ['#6fb7b0','#12504f','#04100f'], g: 'rgba(232,243,241,.4)',  x: '65%' },
-    { b: 'Mira Loux',    s: 'SS 1997', c: 'France', z: '36', p: 1020, k: 'dress',  w: 2, h: 1, t: ['#95cbc0','#1b5f5c','#031412'], g: 'rgba(232,243,241,.45)', x: '55%' }
+    { b: 'Voss & Hale',  s: 'SS 1999', c: 'Italy',  z: '40', p: 1480, k: 'dress',  w: 2, h: 2, t: ['#9fd0cc','#1c6670','#2a6b74'], g: 'rgba(232,243,241,.55)', x: '20%' },
+    { b: 'Marenko',      s: 'FW 1998', c: 'Italy',  z: '38', p: 920,  k: 'coat',   w: 2, h: 1, t: ['#6db0bf','#0b3b3f','#2a6b74'], g: 'rgba(185,216,204,.4)',  x: '70%' },
+    { b: 'Orlov',        s: 'SS 2000', c: 'France', z: '37', p: 640,  k: 'heel',   w: 2, h: 1, t: ['#4a9aa8','#0b3b3f','#35767f'], g: 'rgba(232,243,241,.35)', x: '30%' },
+    { b: 'Niven',        s: 'FW 1997', c: 'UK',     z: '44', p: 780,  k: 'jacket', w: 1, h: 2, t: ['#3f8f9a','#0a3135','#35767f'], g: 'rgba(185,216,204,.35)', x: '60%' },
+    { b: 'Tessari',      s: 'SS 2001', c: 'Italy',  z: 'OS', p: 410,  k: 'bag',    w: 1, h: 1, t: ['#8bc7b5','#1a5a55','#35767f'], g: 'rgba(232,243,241,.45)', x: '15%' },
+    { b: 'Kalder',       s: 'FW 2002', c: 'Japan',  z: '36', p: 560,  k: 'coat',   w: 1, h: 1, t: ['#5fa6c0','#10404a','#35767f'], g: 'rgba(185,216,204,.3)',  x: '75%' },
+    { b: 'Strata',       s: 'SS 2003', c: 'Belgium',z: 'OS', p: 350,  k: 'bag',    w: 1, h: 1, t: ['#7bbab8','#14504f','#35767f'], g: 'rgba(232,243,241,.4)',  x: '80%' },
+    { b: 'Aurelie Vant', s: 'SS 1998', c: 'France', z: '38', p: 1190, k: 'dress',  w: 2, h: 2, t: ['#a8d8c6','#1e6a62','#2a6b74'], g: 'rgba(232,243,241,.5)',  x: '68%' },
+    { b: 'Helix',        s: 'FW 1999', c: 'Italy',  z: '42', p: 830,  k: 'jacket', w: 2, h: 1, t: ['#4b9bb3','#0b3b3f','#35767f'], g: 'rgba(185,216,204,.4)',  x: '25%' },
+    { b: 'Duomo 9',      s: 'FW 2000', c: 'Italy',  z: '39', p: 590,  k: 'heel',   w: 1, h: 1, t: ['#3e8c9c','#0a3236','#35767f'], g: 'rgba(185,216,204,.3)',  x: '40%' },
+    { b: 'Selene',       s: 'FW 2001', c: 'Italy',  z: '46', p: 1340, k: 'coat',   w: 1, h: 1, t: ['#58a4b6','#0c3c43','#35767f'], g: 'rgba(185,216,204,.4)',  x: '22%' },
+    { b: 'Vesper',       s: 'SS 2002', c: 'Spain',  z: '38', p: 470,  k: 'heel',   w: 1, h: 1, t: ['#6fb7b0','#12504f','#35767f'], g: 'rgba(232,243,241,.4)',  x: '65%' },
+    { b: 'Mira Loux',    s: 'SS 1997', c: 'France', z: '36', p: 1020, k: 'dress',  w: 2, h: 1, t: ['#95cbc0','#1b5f5c','#2a6b74'], g: 'rgba(232,243,241,.45)', x: '55%' }
   ];
   var sizes = { dress: 'width:auto;height:78%', coat: 'height:80%', jacket: 'height:76%', heel: 'width:76%;height:auto;bottom:22%', bag: 'width:54%;height:auto;bottom:24%' };
   var vb = { dress: '0 0 100 200', coat: '0 0 100 200', jacket: '0 0 100 200', heel: '0 0 160 100', bag: '0 0 120 120' };
